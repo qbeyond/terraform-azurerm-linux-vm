@@ -1,0 +1,28 @@
+{
+    "version": "0.2",
+    "language": "en",
+    "ignorePaths": [
+        "**/node_modules/**",
+        "**/vscode-extension/**",
+        "**/.git/**",
+        "**/.pnpm-lock.json",
+        ".vscode",
+        "package-lock.json",
+        "megalinter-reports",
+        ".gitignore"
+    ],
+    "words": [
+        "Subfolders",
+        "azurerm",
+        "fullspec",
+        "jsondecode",
+        "jsonencode",
+        "postcondition",
+        "qbeyond",
+        "regexall",
+        "setsubtract",
+        "setunion",
+        "tflint",
+        "toset"
+    ]
+}

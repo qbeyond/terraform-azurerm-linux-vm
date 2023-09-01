@@ -107,6 +107,7 @@ variable "admin_password" {
   type        = string
   sensitive   = true
   description = "Password of the local administrator."
+  default     = ""
 }
 
 variable "public_key" {

@@ -23,8 +23,8 @@ variable "nic_config" {
   type = object({
       private_ip  = optional(string)
       dns_servers = optional(list(string))
-      nsg_name    = optional(string)
-      nsg_rg_name = optional(string)
+      nsg_name    = optional(string, "")
+      nsg_rg_name = optional(string, "")
   })
   default = {}
   description = <<-DOC
@@ -51,7 +51,7 @@ variable "virtual_machine_config" {
       hostname                  = string
       size                      = string
       location                  = string
-      zone                      = optional(string)
+      zone                      = optional(string, "")
       admin_username            = optional(string, "loc_sysadmin")
       os_sku                    = optional(string, "gen2")
       os_offer                  = optional(string, "sles-15-sp4")
@@ -74,8 +74,8 @@ variable "virtual_machine_config" {
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS"
   }
   validation {
-    condition     = contains(["", "1", "2", "3"],var.virtual_machine_config.zone)
-    error_message = "Possible values are empty, 1, 2, 3"
+    condition     = contains(["", "1", "2", "3"], var.virtual_machine_config.zone)
+    error_message = "Possible values are empty, 1, 2, or 3"
   }
   description = <<-DOC
   ```

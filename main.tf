@@ -47,14 +47,15 @@ resource "azurerm_network_interface_security_group_association" "this" {
 }
 
 resource "azurerm_linux_virtual_machine" "this" {
-  name                     = local.virtual_machine.name
-  computer_name            = var.virtual_machine_config.hostname
-  location                 = var.virtual_machine_config.location
-  resource_group_name      = var.resource_group_name
-  size                     = var.virtual_machine_config.size
-  provision_vm_agent       = true
-  admin_username           = var.virtual_machine_config.admin_username
-  admin_password           = var.admin_password
+  name                            = local.virtual_machine.name
+  computer_name                   = var.virtual_machine_config.hostname
+  location                        = var.virtual_machine_config.location
+  resource_group_name             = var.resource_group_name
+  size                            = var.virtual_machine_config.size
+  provision_vm_agent              = true
+  admin_username                  = var.virtual_machine_config.admin_username
+  admin_password                  = var.admin_password
+  disable_password_authentication = length(var.admin_password) > 0 && length(var.public_key) == 0 ? false : true
 
   dynamic "admin_ssh_key" {
     for_each = length(var.public_key) > 0 ? [1] : []
@@ -83,8 +84,8 @@ resource "azurerm_linux_virtual_machine" "this" {
     version   = var.virtual_machine_config.os_version
   }
 
-  availability_set_id = length(var.virtual_machine_config.availability_set_id) > 0 ? var.virtual_machine_config.availability_set_id : null
-  zone                = length(var.virtual_machine_config.zone) > 0 ? var.virtual_machine_config.zone : null
+  availability_set_id = var.virtual_machine_config.availability_set_id
+  zone                = length(var.virtual_machine_config.zone) > 0 && var.virtual_machine_config.availability_set_id == null ? var.virtual_machine_config.zone : null
   tags                = merge(var.virtual_machine_config.tags, {"Severity Group Monthly" = var.severity_group})
 
   lifecycle {

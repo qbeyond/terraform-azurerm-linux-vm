@@ -84,7 +84,7 @@ resource "azurerm_linux_virtual_machine" "this" {
     version   = var.virtual_machine_config.os_version
   }
 
-  availability_set_id = var.virtual_machine_config.availability_set_id
+  availability_set_id = length(var.virtual_machine_config.availability_set_id) > 0 ? var.virtual_machine_config.availability_set_id : null
   zone                = length(var.virtual_machine_config.zone) > 0 && var.virtual_machine_config.availability_set_id == null ? var.virtual_machine_config.zone : null
   tags                = merge(var.virtual_machine_config.tags, {"Severity Group Monthly" = var.severity_group})
 

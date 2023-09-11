@@ -3,8 +3,9 @@ resource "azurerm_virtual_machine_extension" "microsoftmonitoringagent" {
   name                       = "MicrosoftMonitoringAgent"
   virtual_machine_id         = azurerm_linux_virtual_machine.this.id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
-  type                       = "MicrosoftMonitoringAgent"
-  type_handler_version       = "1.0"
+  type                       = "OmsAgentForLinux"
+  type_handler_version       = "1.16"
+  automatic_upgrade_enabled  = true
   auto_upgrade_minor_version = true
 
   settings = <<SETTINGS

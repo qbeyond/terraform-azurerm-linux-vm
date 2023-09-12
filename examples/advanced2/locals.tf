@@ -11,7 +11,7 @@ locals {
   ## VM DECLARATION.
 
   vm_ux_qby = {
-    PEACFASE033 = {
+    CUSTAPP001 = {
       resource_group_name = azurerm_resource_group.this.name
       subnet              = azurerm_subnet.this
       public_ip_config = {
@@ -45,10 +45,10 @@ locals {
       write_accelerator_enabled = false
       severity_group            = ""
       name_overrides = {
-        nic             = "nic-examples_vm_PEACFASE033"
-        nic_ip_config   = "nic-ip-examples_vm_PEACFASE033"
-        public_ip       = "pip-examples_vm_PEACFASE033"
-        virtual_machine = "vm-PEACFASE033"
+        nic             = "nic-examples_vm_CUSTAPP001"
+        nic_ip_config   = "nic-ip-examples_vm_CUSTAPP001"
+        public_ip       = "pip-examples_vm_CUSTAPP001"
+        virtual_machine = "vm-CUSTAPP001"
       }
       log_analytics_agent       = azurerm_log_analytics_workspace.this
       
@@ -57,14 +57,15 @@ locals {
       vm_name_as_disk_prefix    = true        # Insert vm-<hostname>- as prefix disk name
       disk_prefix               = "datadisk" # Is part of the prefix of the disk name. 'vm-<hostname>-<disk_prefix>-<data_disk_key>
       data_disks = {                         # 'vm-<hostname>' is added by the VM module.
-        shared-01 = {                        # Examp. With disk prefix: vm-PEACFASE033-datadisk-shared-01., Without: vm-PEACFASE033-shared-01
-          lun                       = 1     
-          tier                      = "P4"
-          caching                   = "ReadWrite"
-          disk_size_gb              = 32
-          create_option             = "Empty"
-          storage_account_type      = "StandardSSD_LRS"
-          write_accelerator_enabled = false
+        shared-01 = {                        # Examp. With disk prefix: vm-CUSTAPP001-datadisk-shared-01., Without: vm-CUSTAPP001-shared-01
+          lun                        = 1     
+          tier                       = "P4"
+          caching                    = "ReadWrite"
+          disk_size_gb               = 32
+          create_option              = "Empty"
+          storage_account_type       = "StandardSSD_LRS"
+          write_accelerator_enabled  = false
+          on_demand_bursting_enabled = true
         }
         sap-01 = {
           lun                       = 2
@@ -77,7 +78,7 @@ locals {
         }
       }
     }
-    PEACFASE034 = {
+    CUSTAPP002 = {
       resource_group_name = azurerm_resource_group.this.name
       subnet              = azurerm_subnet.this
       public_ip_config = {

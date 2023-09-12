@@ -99,13 +99,14 @@ module "virtual_machine" {
   disk_prefix            = "datadisk"         # Is part of the prefix of the disk name. 'vm-<hostname>-<disk_prefix>-<data_disk_key>
   data_disks = {                         
     shared-01 = {  # Examp. Name result, could be: vm-CUSTAPP001-datadisk-shared-01., or vm-CUSTAPP001-shared-01, or datadisk-shared-01, or shared-01
-    lun                       = 1     
-    tier                      = "P4"
-    caching                   = "ReadWrite"
-    disk_size_gb              = 32
-    create_option             = "Empty"
-    storage_account_type      = "StandardSSD_LRS"
-    write_accelerator_enabled = false
+    lun                        = 1     
+    tier                       = "P4"
+    caching                    = "ReadWrite"
+    disk_size_gb               = 32
+    create_option              = "Empty"
+    storage_account_type       = "StandardSSD_LRS"
+    write_accelerator_enabled  = false
+    on_demand_bursting_enabled = true
     }
     sap-01 = {
       lun                       = 2
@@ -243,13 +244,14 @@ locals {
       disk_prefix               = "datadisk" # Is part of the prefix of the disk name. 'vm-<hostname>-<disk_prefix>-<data_disk_key>
       data_disks = {                         # 'vm-<hostname>' is added by the VM module.
         shared-01 = {                        # Examp. With disk prefix: vm-PEACFASE033-datadisk-shared-01., Without: vm-PEACFASE033-shared-01
-          lun                       = 1     
-          tier                      = "P4"
-          caching                   = "ReadWrite"
-          disk_size_gb              = 32
-          create_option             = "Empty"
-          storage_account_type      = "StandardSSD_LRS"
-          write_accelerator_enabled = false
+          lun                        = 1     
+          tier                       = "P4"
+          caching                    = "ReadWrite"
+          disk_size_gb               = 32
+          create_option              = "Empty"
+          storage_account_type       = "StandardSSD_LRS"
+          write_accelerator_enabled  = false
+          on_demand_bursting_enabled = true
         }
         sap-01 = {
           lun                       = 2
@@ -322,21 +324,22 @@ module "linux_vm_qby" {
   nic_config             = each.value.nic_config
   subnet                 = each.value.subnet
   virtual_machine_config = {
-    hostname                  = each.key
-    size                      = each.value.size
-    location                  = local.location
-    zone                      = each.value.zone
-    admin_username            = each.value.admin_username
-    os_sku                    = each.value.os_sku
-    os_offer                  = each.value.os_offer
-    os_version                = each.value.os_version
-    os_publisher              = each.value.os_publisher
-    os_disk_name              = each.value.os_disk_name
-    os_disk_caching           = each.value.os_disk_caching
-    os_disk_size_gb           = each.value.os_disk_size_gb
-    os_disk_storage_type      = each.value.os_disk_storage_type
-    availability_set_id       = each.value.availability_set_id
-    write_accelerator_enabled = each.value.write_accelerator_enabled
+    hostname                   = each.key
+    size                       = each.value.size
+    location                   = local.location
+    zone                       = each.value.zone
+    admin_username             = each.value.admin_username
+    os_sku                     = each.value.os_sku
+    os_offer                   = each.value.os_offer
+    os_version                 = each.value.os_version
+    os_publisher               = each.value.os_publisher
+    os_disk_name               = each.value.os_disk_name
+    os_disk_caching            = each.value.os_disk_caching
+    os_disk_size_gb            = each.value.os_disk_size_gb
+    os_disk_storage_type       = each.value.os_disk_storage_type
+    availability_set_id        = each.value.availability_set_id
+    write_accelerator_enabled  = each.value.write_accelerator_enabled
+    on_demand_bursting_enabled = length(each.value.on_demand_bursting_enabled) > 0 ? true : false
   }
   admin_password         = each.value.admin_password
   public_key             = each.value.public_key
@@ -417,7 +420,7 @@ resource "azurerm_log_analytics_workspace" "this" {
 | <a name="input_virtual_machine_config"></a> [virtual\_machine\_config](#input\_virtual\_machine\_config) | <pre>size: The size of the vm. Possible values can be seen here: https://learn.microsoft.com/en-us/azure/virtual-machines/sizes<br>  os_sku: (Required) The os that will be running on the vm. Default: gen2. <br>      os_offer: (Required) Specifies the offer of the image used to create the virtual machines. Changing this forces a new resource to be created. Default: sles-15-sp4. <br>  os_publisher: (Required) Specifies the publisher of the image used to create the virtual machines. Changing this forces a new resource to be created. Default: SUSE.<br>  os_version: Optionally specify an os version for the chosen sku. Defaults: 2023.02.05.<br>  location: The location of the virtual machine.<br>  availability_set_id: Optionally specify an availibilty set for the vm.<br>  zone: Optionally specify an availibility zone for the vm.<br>  admin_username: Optionally choose the admin_username of the vm. Defaults to loc_sysadmin. <br>admin_ssh_key: <br>    The local admin name could be changed by the gpo in the target ad.<br>  os_disk_name: (Optional) The name which should be used for the Internal OS Disk. Changing this forces a new resource to be created. Default: OsDisk_01.<br>  os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.<br>  os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.<br>  os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.<br>  tags: Optionally specify tags in as a map.<br>  write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only<br>    be activated on Premium_LRS disks and caching deactivated. Defaults to false.</pre> | <pre>object({<br>      hostname = string<br>      size = string <br>      location = string<br>      os_sku = optional(string, "gen2")<br>      os_version                = optional(string, "2023.02.05") <br>      os_offer                  = optional(string, "sles-15-sp4") <br>      os_publisher              = optional(string, "SUSE") <br>      availability_set_id = optional(string)<br>      zone = optional(string)<br>      admin_username = optional(string, "loc_sysadmin") <br>      os_disk_name              = optional(string, "OsDisk_01") <br>      os_disk_caching = optional(string, "ReadWrite")<br>      os_disk_storage_type = optional(string, "StandardSSD_LRS")<br>      os_disk_size_gb = optional(number)<br>      tags = optional(map(string)) <br>      write_accelerator_enabled = optional(bool, false) <br>  })</pre> | n/a | yes |
 | <a name="input_vm_name_as_disk_prefix"></a> [vm\_name\_as\_disk\_prefix](#input\_vm\_name\_as\_disk\_prefix) | Optional. Prefix name of VM for additional disks. Insert vm-<hostname>- as prefix disk name | `bool` | false | no |
 | <a name="input_disk_prefix"></a> [disk\_prefix](#input\_disk\_prefix) | Optional. Prefix name for additional disks. | `string` | n/a | no |
-| <a name="input_data_disks"></a> [data\_disks](#input\_data\_disks) | <pre><name of the data disk> = {<br>  lun: Number of the lun.<br>  disk_size_gb: The size of the data disk.<br>  tier: (Optional) The disk performance tier to use. Possible values are documented here. This feature is currently supported only for premium SSDs. <br>  storage_account_type: Optionally change the storage_account_type. Defaults to StandardSSD_LRS.<br>  caching: Optionally activate disk caching. Defaults to ReadWrite.<br>  create_option: Optionally change the create option. Defaults to Empty disk.<br>  write_accelerator_enabled: Optionally activate write accelaration for the data disk. Can only<br>    be activated on Premium_LRS disks and caching deactivated. Defaults to false.<br> }</pre> | <pre>map(object({<br>    lun                       = number<br>    disk_size_gb              = number<br>    tier                      = optional(string)<br>    storage_account_type      = optional(string, "StandardSSD_LRS")<br>    caching                   = optional(string, "ReadWrite")<br>    create_option             = optional(string, "Empty")<br>    write_accelerator_enabled = optional(bool, false)<br> }))</pre> | `{}` | no |
+| <a name="input_data_disks"></a> [data\_disks](#input\_data\_disks) | <pre><name of the data disk> = {<br>  lun: Number of the lun.<br>  disk_size_gb: The size of the data disk.<br>  tier: (Optional) The disk performance tier to use. Possible values are documented here. This feature is currently supported only for premium SSDs. <br>  storage_account_type: Optionally change the storage_account_type. Defaults to StandardSSD_LRS.<br>  caching: Optionally activate disk caching. Defaults to ReadWrite.<br>  create_option: Optionally change the create option. Defaults to Empty disk.<br>  write_accelerator_enabled: Optionally activate write accelaration for the data disk. Can only<br>    be activated on Premium_LRS disks and caching deactivated. Defaults to false.<br> }</pre> | <pre>map(object({<br>    lun                        = number<br>    disk_size_gb               = number<br>    tier                       = optional(string)<br>    storage_account_type       = optional(string, "StandardSSD_LRS")<br>    caching                    = optional(string, "ReadWrite")<br>    create_option              = optional(string, "Empty")<br>    write_accelerator_enabled  = optional(bool, false)<br>    on_demand_bursting_enabled = optional(bool, false)<br> }))</pre> | `{}` | no |
 | <a name="input_log_analytics_agent"></a> [log\_analytics\_agent](#input\_log\_analytics\_agent) | <pre>Installs the log analytics agent(MicrosoftMonitoringAgent).<br>  workspace_id: Specify id of the log analytics workspace to which monitoring data will be sent.<br>  shared_key: The Primary shared key for the Log Analytics Workspace..</pre> | <pre>object({<br>    workspace_id = string<br>    primary_shared_key = string <br>  })</pre> | `null` | no |
 | <a name="input_name_overrides"></a> [name\_overrides](#input\_name\_overrides) | Possibility to override names that will be generated according to q.beyond naming convention. | <pre>object({<br>      nic = optional(string)<br>      nic_ip_config = optional(string)<br>      public_ip = optional(string)<br>      virtual_machine = optional(string)<br>  })</pre> | `{}` | no |
 | <a name="input_nic_config"></a> [nic\_config](#input\_nic\_config) | <pre>  private_ip: Optioanlly specify a private ip to use. Otherwise it will  be allocated dynamically.<br>  dns_servers: Optionally specify a list of dns servers for the nic.<br>  nsg_name: Optinally specify the name of a network security group that will be assigned to the nic.<br>  nsg_rg_name: Optinally specify the resource group name of a network security group that will be assigned to the nic.</pre> | <pre>object({<br>      private_ip = optional(string)<br>      dns_servers = optional(list(string))<br>      nsg_name    = optional(string)<br>      nsg_rg_name = optional(string)<br>      })</pre> | `{}` | no |

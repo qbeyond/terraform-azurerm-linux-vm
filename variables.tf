@@ -130,13 +130,14 @@ variable "disk_prefix" {
 
 variable "data_disks" { # change to map of objects
   type = map(object({
-    lun                       = number
-    disk_size_gb              = number
-    tier                      = optional(string)
-    caching                   = optional(string, "ReadWrite")
-    create_option             = optional(string, "Empty")
-    storage_account_type      = optional(string, "StandardSSD_LRS")
-    write_accelerator_enabled = optional(bool, false)
+    lun                        = number
+    disk_size_gb               = number
+    tier                       = optional(string)
+    caching                    = optional(string, "ReadWrite")
+    create_option              = optional(string, "Empty")
+    storage_account_type       = optional(string, "StandardSSD_LRS")
+    write_accelerator_enabled  = optional(bool, false)
+    on_demand_bursting_enabled = optional(bool, false)
  }))
  validation {
    condition     = length([for v in var.data_disks : v.lun]) == length(distinct([for v in var.data_disks : v.lun]))

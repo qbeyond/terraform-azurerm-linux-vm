@@ -12,8 +12,7 @@ module "virtual_machine" {
   nic_config = {
     private_ip  = "10.0.0.16"
     dns_servers = [ "10.0.0.10", "10.0.0.11" ]
-    nsg_name    = local.nsg_name
-    nsg_rg_name = azurerm_network_security_group.this.resource_group_name
+    nsg = azurerm_network_security_group.this
   }
     virtual_machine_config = {
     hostname             = "CUSTAPP007"

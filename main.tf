@@ -1,10 +1,3 @@
-# To have a NSG
-data "azurerm_network_security_group" "this" {
-  count               = length(var.nic_config.nsg_name) > 0 && length(var.nic_config.nsg_rg_name) > 0 ? 1 : 0
-  name                = var.nic_config.nsg_name
-  resource_group_name = var.nic_config.nsg_rg_name
-}
- 
 resource "azurerm_public_ip" "this" {
   count               = var.public_ip_config.enabled ? 1 : 0
   name                = local.public_ip.name
@@ -41,9 +34,9 @@ resource "azurerm_network_interface" "this" {
 }
 
 resource "azurerm_network_interface_security_group_association" "this" {
-  count                     = length(var.nic_config.nsg_name) > 0 ? 1 : 0
-  network_interface_id      = azurerm_network_interface.this.id
-  network_security_group_id = data.azurerm_network_security_group.this[0].id
+  count = var.nic_config.nsg != null ? 1 : 0
+  network_interface_id = azurerm_network_interface.this.id
+  network_security_group_id = var.nic_config.nsg.id
 }
 
 resource "azurerm_linux_virtual_machine" "this" {
@@ -84,9 +77,9 @@ resource "azurerm_linux_virtual_machine" "this" {
     version   = var.virtual_machine_config.os_version
   }
 
-  availability_set_id = length(var.virtual_machine_config.availability_set_id) > 0 ? var.virtual_machine_config.availability_set_id : null
-  zone                = length(var.virtual_machine_config.zone) > 0 && var.virtual_machine_config.availability_set_id == null ? var.virtual_machine_config.zone : null
-  tags                = merge(var.virtual_machine_config.tags, {"Severity Group Monthly" = var.severity_group})
+  availability_set_id = var.virtual_machine_config.availability_set_id
+  zone                = var.virtual_machine_config.zone
+  tags                = local.virtual_machine.tags
 
   lifecycle {
     prevent_destroy = true

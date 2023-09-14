@@ -24,8 +24,7 @@ locals {
 
         # 1.- create a NSG with: https://github.com/qbeyond/terraform-azurerm-nsg
         # 2.- Insert the name of NSG and the NSG RG
-        nsg_name    = "nsg-examples_vm_deploy-02"  # nsg_name    = "nsg-multiiacvm-dev-demo21-01"
-        nsg_rg_name = azurerm_network_security_group.this.resource_group_name  # nsg_rg_name = azurerm_resource_group.rg.name
+        nsg = azurerm_network_security_group.this
       }
       size                      = "Standard_E4as_v5"
       location                  = local.location

@@ -21,19 +21,18 @@ variable "public_ip_config" {
 # nsg needs to be an object to use the count object in main.tf. 
 variable "nic_config" {
   type = object({
-      private_ip  = optional(string)
-      dns_servers = optional(list(string))
-      nsg_name    = optional(string, "")
-      nsg_rg_name = optional(string, "")
+    private_ip  = optional(string)
+    dns_servers = optional(list(string))
+    nsg = optional(object({
+      id = string
+    }))
   })
-  default = {}
+  default     = {}
   description = <<-DOC
   ```
     private_ip: Optioanlly specify a private ip to use. Otherwise it will  be allocated dynamically.
     dns_servers: Optionally specify a list of dns servers for the nic.
-    nsg_name: Optinally specify the name of a network security group that will be assigned to the nic.
-    nsg_rg_name: Optinally specify the RG name of a network security group that will be assigned to the nic.
-    nsg_id: Optinally specify the id of a network security group that will be assigned to the nic.
+    nsg_id: Optinally specify the id of a network security group that will be assigned to the nic.    
   ```
   DOC
 }
@@ -51,7 +50,6 @@ variable "virtual_machine_config" {
       hostname                  = string
       size                      = string
       location                  = string
-      zone                      = optional(string, "")
       admin_username            = optional(string, "loc_sysadmin")
       os_sku                    = optional(string, "gen2")
       os_offer                  = optional(string, "sles-15-sp4")
@@ -61,6 +59,7 @@ variable "virtual_machine_config" {
       os_disk_caching           = optional(string, "ReadWrite")
       os_disk_size_gb           = optional(number, 64)
       os_disk_storage_type      = optional(string, "StandardSSD_LRS")
+      zone                      = optional(string, "")
       availability_set_id       = optional(string)
       write_accelerator_enabled = optional(bool, false)
       tags                      = optional(map(string))
@@ -75,24 +74,27 @@ variable "virtual_machine_config" {
   }
   validation {
     condition     = contains(["", "1", "2", "3"], var.virtual_machine_config.zone)
-    error_message = "Possible values are empty, 1, 2, or 3"
+    error_message = "Possible values are null, 1, 2, or 3 per zone"
   }
   description = <<-DOC
   ```
     size: The size of the vm. Possible values can be seen here: https://learn.microsoft.com/en-us/azure/virtual-machines/sizes
-    os_sku: The os that will be running on the vm.
     location: The location of the virtual machine.
-    availability_set_id: Optionally specify an availibilty set for the vm.
-    zone: Optionally specify an availibility zone for the vm. 
-    os_version: Optionally specify an os version for the chosen sku. Defaults to latest.
     admin_username: Optionally choose the admin_username of the vm. Defaults to loc_sysadmin. 
       The local admin name could be changed by the gpo in the target ad.
+    os_sku: The os that will be running on the vm.
+    os_offer: (Required) Specifies the offer of the image used to create the virtual machines. Changing this forces a new resource to be created.
+    os_version: Optionally specify an os version for the chosen sku. Defaults to latest.
+    os_publisher: (Required) Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from. Changing this forces a new resource to be created.
+    os_disk_name: The name which should be used for the Internal OS Disk. Changing this forces a new resource to be created
     os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.
-    os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.
     os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.
-    tags: Optionally specify tags in as a map.
+    os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.
+    zone: Optionally specify an availibility zone for the vm.
+    availability_set_id: Optionally specify an availibilty set for the vm.
     write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only
       be activated on Premium_LRS disks and caching deactivated. Defaults to false.
+    tags: Optionally specify tags in as a map.
   ```
   DOC
 }
@@ -101,6 +103,12 @@ variable "severity_group" {
   type        = string
   default     = ""
   description = "The severity group of the virtual machine."
+}
+
+variable "update_allowed" {
+  type        = bool
+  default     = true
+  description = "Set the tag `Update allowed`. `True` will set `yes`, `false` to `no`."
 }
 
 variable "admin_password" {

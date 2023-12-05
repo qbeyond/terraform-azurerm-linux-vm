@@ -58,12 +58,8 @@ resource "azurerm_linux_virtual_machine" "this" {
     }
   }
 
-  network_interface_ids = [
-    azurerm_network_interface.this.id,
-  ]
-
   os_disk {
-    name                      = var.virtual_machine_config.os_disk_name
+    name                      = "${var.virtual_machine_config.hostname}-${var.virtual_machine_config.os_disk_name}"
     caching                   = var.virtual_machine_config.os_disk_caching
     disk_size_gb              = var.virtual_machine_config.os_disk_size_gb
     storage_account_type      = var.virtual_machine_config.os_disk_storage_type    
@@ -77,9 +73,11 @@ resource "azurerm_linux_virtual_machine" "this" {
     version   = var.virtual_machine_config.os_version
   }
 
-  availability_set_id = var.virtual_machine_config.availability_set_id
-  zone                = var.virtual_machine_config.zone
-  tags                = local.virtual_machine.tags
+  proximity_placement_group_id = var.virtual_machine_config.proximity_placement_group_id
+  network_interface_ids        = concat([azurerm_network_interface.this.id], var.additional_network_interface_ids)
+  availability_set_id          = var.virtual_machine_config.availability_set_id
+  zone                         = var.virtual_machine_config.zone
+  tags                         = local.virtual_machine.tags
 
   lifecycle {
     prevent_destroy = true

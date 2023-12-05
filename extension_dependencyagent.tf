@@ -1,4 +1,5 @@
 resource "azurerm_virtual_machine_extension" "DependencyAgentLinux" {
+  count                      = var.log_analytics_agent != null ? 1 : 0
   name                       = "DependencyAgentLinux"
   virtual_machine_id         =  azurerm_linux_virtual_machine.this.id
   publisher                  = "Microsoft.Azure.Monitoring.DependencyAgent"

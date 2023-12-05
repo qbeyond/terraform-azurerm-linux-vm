@@ -12,23 +12,24 @@ module "virtual_machine" {
   nic_config = {
     private_ip  = "10.0.0.16"
     dns_servers = [ "10.0.0.10", "10.0.0.11" ]
-    nsg = azurerm_network_security_group.this
+    nsg         = azurerm_network_security_group.this
   }
     virtual_machine_config = {
-    hostname             = "CUSTAPP007"
-    size                 = "Standard_D2_v5"
-    location             = azurerm_resource_group.this.location
-    admin_username       = "local_admin"
-    size                 = "Standard_D2_v5"
-    os_sku               = "gen2"
-    os_offer             = "sles-15-sp4"
-    os_version           = "2023.02.05"
-    os_publisher         = "SUSE"
-    availability_set_id  = azurerm_availability_set.this.id
-    os_disk_name         = "OsDisk_01"
-    os_disk_caching      = "ReadWrite"
-    os_disk_storage_type = "StandardSSD_LRS"
-    os_disk_size_gb      = 128
+    hostname                     = "CUSTAPP007"
+    size                         = "Standard_D2_v5"
+    location                     = azurerm_resource_group.this.location
+    admin_username               = "local_admin"
+    size                         = "Standard_D2_v5"
+    os_sku                       = "gen2"
+    os_offer                     = "sles-15-sp5"
+    os_version                   = "2023.09.21"
+    os_publisher                 = "SUSE"
+    availability_set_id          = azurerm_availability_set.this.id # Not compatible with zone.
+    proximity_placement_group_id = azurerm_proximity_placement_group.this.id
+    os_disk_name                 = "OsDisk_01"
+    os_disk_caching              = "ReadWrite"
+    os_disk_storage_type         = "StandardSSD_LRS"
+    os_disk_size_gb              = 128
     tags = {
       "Environment" = "prd" 
     }
@@ -79,6 +80,12 @@ resource "azurerm_subnet" "this" {
 
 resource "azurerm_availability_set" "this" {
   name                = local.availability_set_name
+  location            = local.location
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_proximity_placement_group" "this" {
+  name                = local.proximity_placement_group_name
   location            = local.location
   resource_group_name = azurerm_resource_group.this.name
 }

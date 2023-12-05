@@ -6,11 +6,11 @@ resource "azurerm_managed_disk" "data_disk" {
   name                       = length(local.disk_prefix) > 0 ? "${local.disk_prefix}-${each.key}" : each.key
   location                   = var.virtual_machine_config.location
   resource_group_name        = var.resource_group_name
-  tier                       = each.value["storage_account_type"] == "Premium_LRS" || each.value["storage_account_type"] == "Premium_ZRS" ? each.value["tier"] : ""
+  tier                       = each.value["storage_account_type"] == "Premium_LRS" || each.value["storage_account_type"] == "Premium_ZRS" ? each.value["tier"] : null
+  zone                       = each.value["zone"]
   storage_account_type       = each.value["storage_account_type"]
   create_option              = each.value["create_option"]
   disk_size_gb               = each.value["disk_size_gb"]
-  zone                       = length(var.virtual_machine_config.zone) > 0 ? var.virtual_machine_config.zone : null
   on_demand_bursting_enabled = each.value["on_demand_bursting_enabled"]
   lifecycle {
     prevent_destroy = true

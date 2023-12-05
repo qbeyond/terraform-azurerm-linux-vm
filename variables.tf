@@ -37,6 +37,12 @@ variable "nic_config" {
   DOC
 }
 
+variable "additional_network_interface_ids" {
+  type        = list(string)
+  default     = []
+  description = "List of ids for additional azurerm_network_interface."
+}
+
 variable "subnet" {
   type               = object ({
     id               = string
@@ -47,22 +53,23 @@ variable "subnet" {
 
 variable "virtual_machine_config" {
   type = object({
-      hostname                  = string
-      size                      = string
-      location                  = string
-      admin_username            = optional(string, "loc_sysadmin")
-      os_sku                    = optional(string, "gen2")
-      os_offer                  = optional(string, "sles-15-sp4")
-      os_version                = optional(string, "2023.02.05")
-      os_publisher              = optional(string, "SUSE")
-      os_disk_name              = optional(string, "OsDisk_01")
-      os_disk_caching           = optional(string, "ReadWrite")
-      os_disk_size_gb           = optional(number, 64)
-      os_disk_storage_type      = optional(string, "StandardSSD_LRS")
-      zone                      = optional(string, "")
-      availability_set_id       = optional(string)
-      write_accelerator_enabled = optional(bool, false)
-      tags                      = optional(map(string))
+      hostname                     = string
+      size                         = string
+      location                     = string
+      admin_username               = optional(string, "loc_sysadmin")
+      os_sku                       = optional(string, "gen2")
+      os_offer                     = optional(string, "sles-15-sp5")
+      os_version                   = optional(string, "2023.09.21")
+      os_publisher                 = optional(string, "SUSE")
+      os_disk_name                 = optional(string, "OsDisk_01")
+      os_disk_caching              = optional(string, "ReadWrite")
+      os_disk_size_gb              = optional(number, 64)
+      os_disk_storage_type         = optional(string, "StandardSSD_LRS")
+      zone                         = optional(string)
+      availability_set_id          = optional(string)
+      write_accelerator_enabled    = optional(bool, false)
+      proximity_placement_group_id = optional(string)
+      tags                         = optional(map(string))
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
@@ -71,10 +78,6 @@ variable "virtual_machine_config" {
   validation {
     condition     = contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"],var.virtual_machine_config.os_disk_storage_type)
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS"
-  }
-  validation {
-    condition     = contains(["", "1", "2", "3"], var.virtual_machine_config.zone)
-    error_message = "Possible values are null, 1, 2, or 3 per zone"
   }
   description = <<-DOC
   ```
@@ -90,10 +93,11 @@ variable "virtual_machine_config" {
     os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.
     os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.
     os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.
-    zone: Optionally specify an availibility zone for the vm.
-    availability_set_id: Optionally specify an availibilty set for the vm.
+    zone: Optionally specify an availibility zone for the vm. Values 1, 2 or 3.
+    availability_set_id: Optionally specify an availibility set for the vm.
     write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only
       be activated on Premium_LRS disks and caching deactivated. Defaults to false.
+    proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.
     tags: Optionally specify tags in as a map.
   ```
   DOC
@@ -141,6 +145,7 @@ variable "data_disks" { # change to map of objects
     lun                        = number
     disk_size_gb               = number
     tier                       = optional(string)
+    zone                       = optional(string)
     caching                    = optional(string, "ReadWrite")
     create_option              = optional(string, "Empty")
     storage_account_type       = optional(string, "StandardSSD_LRS")
@@ -151,17 +156,24 @@ variable "data_disks" { # change to map of objects
    condition     = length([for v in var.data_disks : v.lun]) == length(distinct([for v in var.data_disks : v.lun]))
    error_message = "One or more of the lun parameters in the map are duplicates."
  }
+  validation {
+    condition     = alltrue([for o in var.data_disks : contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], o.storage_account_type)])
+    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS"
+   }
   default = {}
   description = <<-DOC
   ```
    <name of the data disk> = {
     lun: Number of the lun.
     disk_size_gb: The size of the data disk.
+    tier: Optional. The disk performance tier to use. Possible values are documented here. This feature is currently supported only for premium SSDs.
+    zone: Optionally specify an availibility zone for the vm. Values 1, 2 or 3.
     storage_account_type: Optionally change the storage_account_type. Defaults to StandardSSD_LRS.
     caching: Optionally activate disk caching. Defaults to None.
     create_option: Optionally change the create option. Defaults to Empty disk.
     write_accelerator_enabled: Optionally activate write accelaration for the data disk. Can only
       be activated on Premium_LRS disks and caching deactivated. Defaults to false.
+    on_demand_bursting_enabled: Optionally activate disk bursting. . Only for Premium disk. Default false.
    }
   ```
   DOC
@@ -188,8 +200,8 @@ variable "log_analytics_agent" {
     workspace_id       = string
     primary_shared_key = string 
   })
-  sensitive = true 
-  default = null
+  sensitive   = true 
+  default     = null
   description = <<-DOC
   ```
     Installs the log analytics agent(MicrosoftMonitoringAgent).

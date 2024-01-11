@@ -7,7 +7,6 @@ locals {
   proximity_placement_group_name = "ppg-examples_vm_deploy-02"
   nsg_name                       = "nsg-examples_vm_deploy-02"
   law_name                       = "law-examplesvmdeploy-02"
-
   nic                            = "nic-examples_vm_deploy-02"
   nic_ip_config                  = "nic-ip-examples_vm_deploy-02"
   public_ip                      = "pip-examples_vm_deploy-02"

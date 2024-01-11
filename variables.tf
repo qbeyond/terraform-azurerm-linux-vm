@@ -57,11 +57,10 @@ variable "virtual_machine_config" {
       size                         = string
       location                     = string
       admin_username               = optional(string, "loc_sysadmin")
-      os_sku                       = optional(string, "gen2")
-      os_offer                     = optional(string, "sles-15-sp5")
-      os_version                   = optional(string, "2023.09.21")
-      os_publisher                 = optional(string, "SUSE")
-      os_disk_name                 = optional(string, "OsDisk_01")
+      os_sku                       = optional(string, "22_04-lts-gen2")
+      os_offer                     = optional(string, "0001-com-ubuntu-server-jammy")
+      os_version                   = optional(string, "latest")
+      os_publisher                 = optional(string, "Canonical")
       os_disk_caching              = optional(string, "ReadWrite")
       os_disk_size_gb              = optional(number, 64)
       os_disk_storage_type         = optional(string, "StandardSSD_LRS")
@@ -89,7 +88,6 @@ variable "virtual_machine_config" {
     os_offer: (Required) Specifies the offer of the image used to create the virtual machines. Changing this forces a new resource to be created.
     os_version: Optionally specify an os version for the chosen sku. Defaults to latest.
     os_publisher: (Required) Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from. Changing this forces a new resource to be created.
-    os_disk_name: The name which should be used for the Internal OS Disk. Changing this forces a new resource to be created
     os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.
     os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.
     os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.
@@ -126,18 +124,6 @@ variable "public_key" {
   type        = string
   default     = ""
   description = "SSH public key file (e.g. file(id_rsa.pub)"
-}
-
-variable "vm_name_as_disk_prefix" {
-  type        = bool
-  default     = false
-  description = "Insert vm-<hostname>- as prefix disk name."
-}
-
-variable "disk_prefix" {
-  type        = string
-  default     = ""
-  description = "Optional. Prefix name for additional disks."
 }
 
 variable "data_disks" { # change to map of objects
@@ -190,6 +176,8 @@ variable "name_overrides" {
       nic_ip_config   = optional(string)
       public_ip       = optional(string)
       virtual_machine = optional(string)
+      os_disk         = optional(string)
+      data_disks      = optional(map(string), {})
   })
   description = "Possibility to override names that will be generated according to q.beyond naming convention."
   default = {}

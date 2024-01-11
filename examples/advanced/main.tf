@@ -10,30 +10,30 @@ module "virtual_machine" {
   }
   public_key          = file("id_rsa.pub")
   nic_config = {
-    private_ip  = "10.0.0.16"
-    dns_servers = [ "10.0.0.10", "10.0.0.11" ]
-    nsg         = azurerm_network_security_group.this
+    nic1 = {
+      private_ip  = "10.0.0.16"
+      dns_servers = [ "10.0.0.10", "10.0.0.11" ]
+      nsg         = azurerm_network_security_group.this
+    }
   }
-    virtual_machine_config = {
-    hostname                     = "CUSTAPP007"
-    size                         = "Standard_D2_v5"
-    location                     = azurerm_resource_group.this.location
-    admin_username               = "local_admin"
-    size                         = "Standard_D2_v5"
-    os_sku                       = "gen2"
-    os_offer                     = "sles-15-sp5"
-    os_version                   = "2023.09.21"
-    os_publisher                 = "SUSE"
-    availability_set_id          = azurerm_availability_set.this.id # Not compatible with zone.
-    proximity_placement_group_id = azurerm_proximity_placement_group.this.id
-    os_disk_name                 = "OsDisk_01"
-    os_disk_caching              = "ReadWrite"
-    os_disk_storage_type         = "StandardSSD_LRS"
-    os_disk_size_gb              = 128
+  virtual_machine_config = {
+    hostname             = "CUSTAPP007"
+    location             = azurerm_resource_group.this.location
+    zone                 = null # Could be the default value "1", or "2" or "3". Not compatible with availability_set_id enabled.
+    admin_username       = "qbinstall"
+    size                 = "Standard_DS1_v2"
+    os_sku               = "22_04-lts-gen2"
+    os_offer             = "0001-com-ubuntu-server-jammy"
+    os_version           = "latest"
+    os_publisher         = "Canonical"
+    os_disk_caching      = "ReadWrite"
+    os_disk_storage_type = "StandardSSD_LRS"
+    os_disk_size_gb      = 64
     tags = {
       "Environment" = "prd" 
     }
-    write_accelerator_enabled = false
+    availability_set_id        = azurerm_availability_set.this.id # Not compatible with zone.
+    write_accelerator_enabled  = false
   }
   resource_group_name = azurerm_resource_group.this.name
   subnet              = azurerm_subnet.this

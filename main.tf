@@ -59,7 +59,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   }
 
   os_disk {
-    name                      = "${var.virtual_machine_config.hostname}-${var.virtual_machine_config.os_disk_name}"
+    name                      = local.os_disk_name
     caching                   = var.virtual_machine_config.os_disk_caching
     disk_size_gb              = var.virtual_machine_config.os_disk_size_gb
     storage_account_type      = var.virtual_machine_config.os_disk_storage_type    

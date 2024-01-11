@@ -8,7 +8,7 @@ module "virtual_machine" {
         hostname       = "CUSTAPP001"
         location       = local.location
         admin_username = "local_admin"
-        size           = "Standard_D32as_v5"
+        size           = "Standard_B1ms"
     }
 
     admin_password      = "H3ll0W0rld!"

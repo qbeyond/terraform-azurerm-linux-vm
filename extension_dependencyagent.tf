@@ -7,4 +7,5 @@ resource "azurerm_virtual_machine_extension" "DependencyAgentLinux" {
   type_handler_version       = "9.5"
   automatic_upgrade_enabled  = true
   auto_upgrade_minor_version = true
+  settings                   = jsonencode({"enableAMA" = true})
 }

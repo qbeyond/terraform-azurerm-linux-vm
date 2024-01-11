@@ -1,9 +1,6 @@
-locals {
-  disk_prefix = var.vm_name_as_disk_prefix ? (length(var.disk_prefix) > 0 ? "${local.virtual_machine.name}-${var.disk_prefix}" : local.virtual_machine.name) : (length(var.disk_prefix) > 0 ? "${var.disk_prefix}" : "")
-}
 resource "azurerm_managed_disk" "data_disk" {
   for_each                   = var.data_disks
-  name                       = length(local.disk_prefix) > 0 ? "${local.disk_prefix}-${each.key}" : each.key
+  name                       = lookup(var.name_overrides.data_disks, each.key, "disk-${var.virtual_machine_config.hostname}-${each.key}")
   location                   = var.virtual_machine_config.location
   resource_group_name        = var.resource_group_name
   tier                       = each.value["storage_account_type"] == "Premium_LRS" || each.value["storage_account_type"] == "Premium_ZRS" ? each.value["tier"] : null

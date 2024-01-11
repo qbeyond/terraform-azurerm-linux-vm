@@ -9,9 +9,7 @@ This module will create a linux virtual machine, a network interface and associa
 <!-- BEGIN_TF_DOCS -->
 ## Usage
 
-This module provisions a linux virtual machine. Refer to the examples on how this could be done. It is a fast and easy to use deployment of a virtual machine!
-#### Examples
-###### Basic
+It's very easy to use!
 ```hcl
 provider "azurerm" {
   features {}
@@ -23,10 +21,10 @@ module "virtual_machine" {
         hostname       = "CUSTAPP001"
         location       = local.location
         admin_username = "local_admin"
-        size           = "Standard_D2_v5"
+        size           = "Standard_D32as_v5"
     }
 
-    admin_password = "H3ll0W0rld!"
+    admin_password      = "H3ll0W0rld!"
     resource_group_name = azurerm_resource_group.this.name
     subnet              = azurerm_subnet.this
 }
@@ -205,8 +203,6 @@ resource "azurerm_network_security_group" "this" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_admin_password"></a> [admin\_password](#input\_admin\_password) | Password of the local administrator. | `string` | n/a | yes / or public_key |
-| <a name="input_public_key"></a> [public\_key](#input\_public\_key) | Public SSH key of the local administrator. | `string` | n/a | yes / or admin_password |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where the resources will be created. | `string` | n/a | yes |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | The variable takes the subnet as input and takes the id and the address prefix for further configuration. | <pre>object ({<br>    id = string<br>    address_prefixes = list(string)<br>  })</pre> | n/a | yes |
 | <a name="input_virtual_machine_config"></a> [virtual\_machine\_config](#input\_virtual\_machine\_config) | <pre>  hostname: vm hostanme. <br>  size: The size of the vm. Possible values can be seen here: https://learn.microsoft.com/en-us/azure/virtual-machines/sizes<br>  location: The location of the virtual machine.<br>  admin_username: Optionally choose the admin_username of the vm. Defaults to loc_sysadmin.<br>  os_sku: (Required) The os that will be running on the vm. Default: 22_04-lts-gen2.<br>  os_offer: (Required) Specifies the offer of the image used to create the virtual machines. Changing this forces a new resource to be created. Default: 0001-com-ubuntu-server-jammy. <br>  os_version: Optionally specify an os version for the chosen sku. Defaults: latest.<br>  os_publisher: (Required) Specifies the publisher of the image used to create the virtual machines. Changing this forces a new resource to be created. Default: Canonical.<br>  os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.<br>  os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.<br>  os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.<br>  zone: Optionally specify an availibility zone for the vm.  Values 1, 2 or 3. Not compatible with availability_set_id enabled.<br>  availability_set_id: Optionally specify an availibilty set for the vm. Not compatible with zone.<br>  write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only be activated on Premium_LRS disks and caching deactivated. Defaults to false.<br>  proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.<br>  tags: Optionally specify tags in as a map.</pre> | <pre>object({<br>      hostname = string<br>      size = string <br>      location = string<br>      admin_username = optional(string, "loc_sysadmin") <br>      os_sku = optional(string, "22_04-lts-gen2") <br>      os_offer                  = optional(string, "0001-com-ubuntu-server-jammy") <br>      os_version                = optional(string, "latest") <br>      os_publisher              = optional(string, "Canonical") <br>      os_disk_caching = optional(string, "ReadWrite")<br>      os_disk_size_gb = optional(number)<br>      os_disk_storage_type = optional(string, "StandardSSD_LRS")<br>      zone = optional(string)<br>      availability_set_id = optional(string)<br>      write_accelerator_enabled = optional(bool, false)<br>      proximity_placement_group_id = optional(string)<br>      tags = optional(map(string))<br>  })</pre> | n/a | yes |
@@ -229,13 +225,13 @@ resource "azurerm_network_security_group" "this" {
 
 | Type | Used |
 |------|-------|
+| [azurerm_linux_virtual_machine](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | 1 |
 | [azurerm_managed_disk](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/managed_disk) | 1 |
 | [azurerm_network_interface](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | 1 |
 | [azurerm_network_interface_security_group_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_security_group_association) | 1 |
 | [azurerm_public_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | 1 |
 | [azurerm_virtual_machine_data_disk_attachment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_data_disk_attachment) | 1 |
 | [azurerm_virtual_machine_extension](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | 2 |
-| [azurerm_linux_virtual_machine](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | 1 |
 
 **`Used` only includes resource blocks.** `for_each` and `count` meta arguments, as well as resource blocks of modules are not considered.
 
@@ -262,16 +258,17 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_virtual_machine_extension.dependencyagentlinux](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
+| [azurerm_virtual_machine_extension.DependencyAgentLinux](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) | resource |
 
 ### main.tf
 
 | Name | Type |
 |------|------|
+| [azurerm_linux_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
 | [azurerm_network_interface.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) | resource |
 | [azurerm_network_interface_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface_security_group_association) | resource |
 | [azurerm_public_ip.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
-| [azurerm_linux_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) | resource |
+| [azurerm_network_security_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_security_group) | data source |
 <!-- END_TF_DOCS -->
 
 ## Contribute

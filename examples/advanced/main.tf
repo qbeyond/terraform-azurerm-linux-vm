@@ -35,8 +35,10 @@ module "virtual_machine" {
     availability_set_id        = azurerm_availability_set.this.id # Not compatible with zone.
     write_accelerator_enabled  = false
   }
-  resource_group_name = azurerm_resource_group.this.name
-  subnet              = azurerm_subnet.this
+  resource_group_name              = azurerm_resource_group.this.name
+  subnet                           = azurerm_subnet.this
+  additional_network_interface_ids = [azurerm_network_interface.additional_nic_01.id]
+  enable_accelerated_networking    = true
   data_disks = {
     shared-01 = {  # Examp. With disk prefix: vm-CUSTAPP007-datadisk-shared-01., Without: vm-CUSTAPP007-shared-01
       lun                       = 1     
@@ -88,6 +90,33 @@ resource "azurerm_proximity_placement_group" "this" {
   name                = local.proximity_placement_group_name
   location            = local.location
   resource_group_name = azurerm_resource_group.this.name
+  allowed_vm_sizes    = ["Standard_DS1_v2", "Standard_M32ms_v2", "Standard_E16as_v5", "Standard_E8as_v5"]
+  
+  lifecycle {
+      ignore_changes = [tags]
+  }
+}
+
+resource "azurerm_network_interface" "additional_nic_01" {
+  name                          = "nic-vm-${replace(element(azurerm_virtual_network.this.address_space,0), "/[./]/", "-")}-01"
+  location                      = local.location
+  resource_group_name           = azurerm_resource_group.this.name
+  dns_servers                   = []
+  enable_accelerated_networking = true
+
+  ip_configuration {
+    name                          = "ip-nic-01"
+    subnet_id                     = azurerm_subnet.this.id
+    private_ip_address_allocation = "Dynamic"
+    private_ip_address            = null
+    public_ip_address_id          = null
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_network_security_group" "this" {

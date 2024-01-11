@@ -101,13 +101,14 @@ module "virtual_machine" {
     availability_set_id        = azurerm_availability_set.this.id # Not compatible with zone.
     write_accelerator_enabled  = false
   }
-  admin_password                    = ""                 # Write a password if you need.
-  public_key                        = file("id_rsa.pub") # If don't need rsa, leave empty with this "".
-  resource_group_name               = azurerm_resource_group.this.name
-  subnet                            = azurerm_subnet.this
-  additional_network_interface_ids  = [azurerm_network_interface.additional_nic_01.id]
-  severity_group                    = "01-third-tuesday-0200-XCSUFEDTG-reboot"
-  update_allowed                    = true
+  admin_password                   = ""                 # Write a password if you need.
+  public_key                       = file("id_rsa.pub") # If don't need rsa, leave empty with this "".
+  resource_group_name              = azurerm_resource_group.this.name
+  subnet                           = azurerm_subnet.this
+  additional_network_interface_ids = [azurerm_network_interface.additional_nic_01.id]
+  enable_accelerated_networking    = true
+  severity_group                   = "01-third-tuesday-0200-XCSUFEDTG-reboot"
+  update_allowed                   = true
   
   ## DISK DECLARATION
    data_disks = {                         
@@ -172,6 +173,33 @@ resource "azurerm_proximity_placement_group" "this" {
   name                = local.proximity_placement_group_name
   location            = local.location
   resource_group_name = azurerm_resource_group.this.name
+  allowed_vm_sizes    = ["Standard_DS1_v2", "Standard_M32ms_v2", "Standard_E16as_v5", "Standard_E8as_v5"]
+  
+  lifecycle {
+      ignore_changes = [tags]
+  }
+}
+
+resource "azurerm_network_interface" "additional_nic_01" {
+  name                          = "nic-vm-${replace(element(azurerm_virtual_network.this.address_space,0), "/[./]/", "-")}-01"
+  location                      = local.location
+  resource_group_name           = azurerm_resource_group.this.name
+  dns_servers                   = []
+  enable_accelerated_networking = true
+
+  ip_configuration {
+    name                          = "ip-nic-01"
+    subnet_id                     = azurerm_subnet.this.id
+    private_ip_address_allocation = "Dynamic"
+    private_ip_address            = null
+    public_ip_address_id          = null
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_network_security_group" "this" {
@@ -212,6 +240,7 @@ resource "azurerm_network_security_group" "this" {
 | <a name="input_nic_config"></a> [nic\_config](#input\_nic\_config) | <pre>  private_ip: Optioanlly specify a private ip to use. Otherwise it will  be allocated dynamically.<br>  dns_servers: Optionally specify a list of dns servers for the nic.<br>  nsg_id: Optinally specify the id of a network security group that will be assigned to the nic.</pre> | <pre>object({<br>    private_ip  = optional(string)<br>    dns_servers = optional(list(string))<br>    nsg = optional(object({<br>      id = string<br>    }))<br>  })</pre> | `{}` | no |
 | <a name="input_public_ip_config"></a> [public\_ip\_config](#input\_public\_ip\_config) | <pre>enabled: Optionally select true if a public ip should be created. Defaults to false.<br>  allocation_method: The allocation method of the public ip that will be created. Defaults to static.</pre> | <pre>object({<br>      enabled = bool<br>      allocation_method = optional(string, "Static")<br>  })</pre> | <pre>{<br>  "enabled": false<br>}</pre> | no |
 | <a name="additional_network_interface_ids"></a> [additional\_network\_interface](#additional\_network\_interface) | <pre>List of ids for additional azurerm_network_interface.</pre> | `list(string)` | `[]` | no |
+| <a name="input_enable_accelerated_networking"></a> [enable\_accelerated\_networking](#input\_enable\_accelerated\_networking) | Enabled Accelerated networking (SR-IOV) on the NIC. The machine SKU must support this feature.| `bool` | `false` | no |
 | <a name="input_severity_group"></a> [severity\_group](#input\_severity\_group) | The severity group of the virtual machine. | `string` | `""` | no |
 | <a name="input_update_allowed"></a> [update\_allowed](#input\_update\_allowed) | Set the tag `Update allowed`. `true` will set `yes`, `false` to `no`. | `bool` | `true` | no |
 |

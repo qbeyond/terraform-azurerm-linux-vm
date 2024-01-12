@@ -59,13 +59,13 @@ variable "virtual_machine_config" {
     size                         = string
     location                     = string
     admin_username               = optional(string, "loc_sysadmin")
-    os_sku                       = optional(string, "22_04-lts-gen2")
-    os_offer                     = optional(string, "0001-com-ubuntu-server-jammy")
+    os_sku                       = string
+    os_offer                     = optional(string)
     os_version                   = optional(string, "latest")
-    os_publisher                 = optional(string, "Canonical")
+    os_publisher                 = optional(string)
     os_disk_caching              = optional(string, "ReadWrite")
     os_disk_size_gb              = optional(number, 64)
-    os_disk_storage_type         = optional(string, "StandardSSD_LRS")
+    os_disk_storage_type         = optional(string, "Premium_LRS")
     zone                         = optional(string)
     availability_set_id          = optional(string)
     write_accelerator_enabled    = optional(bool, false)
@@ -93,7 +93,7 @@ variable "virtual_machine_config" {
     os_publisher: (Required) Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from. Changing this forces a new resource to be created.
     os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.
     os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.
-    os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.
+    os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to Premium_LRS.
     zone: Optionally specify an availibility zone for the vm. Values 1, 2 or 3.
     availability_set_id: Optionally specify an availibility set for the vm.
     write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only

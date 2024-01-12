@@ -17,7 +17,7 @@ resource "azurerm_network_interface" "this" {
   location                      = var.virtual_machine_config.location
   resource_group_name           = var.resource_group_name
   dns_servers                   = var.nic_config.dns_servers
-  enable_accelerated_networking = var.enable_accelerated_networking
+  enable_accelerated_networking = var.nic_config.enable_accelerated_networking
 
   ip_configuration {
     name                          = local.nic.ip_config_name

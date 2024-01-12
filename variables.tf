@@ -21,8 +21,9 @@ variable "public_ip_config" {
 # nsg needs to be an object to use the count object in main.tf. 
 variable "nic_config" {
   type = object({
-    private_ip  = optional(string)
-    dns_servers = optional(list(string))
+    private_ip                    = optional(string)
+    dns_servers                   = optional(list(string))
+    enable_accelerated_networking = optional(bool, false)
     nsg = optional(object({
       id = string
     }))
@@ -32,15 +33,10 @@ variable "nic_config" {
   ```
     private_ip: Optioanlly specify a private ip to use. Otherwise it will  be allocated dynamically.
     dns_servers: Optionally specify a list of dns servers for the nic.
+    enable_accelerated_networking: Enabled Accelerated networking (SR-IOV) on the NIC. The machine SKU must support this feature.
     nsg_id: Optinally specify the id of a network security group that will be assigned to the nic.    
   ```
   DOC
-}
-
-variable "enable_accelerated_networking" {
-  description = "Enabled Accelerated networking (SR-IOV) on the NIC. The machine SKU must support this feature. https://docs.microsoft.com/en-us/azure/virtual-network/create-vm-accelerated-networking-powershell"
-  type        = bool
-  default     = "false"
 }
 
 variable "additional_network_interface_ids" {

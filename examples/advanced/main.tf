@@ -10,11 +10,10 @@ module "virtual_machine" {
   }
   public_key          = file("id_rsa.pub")
   nic_config = {
-    nic1 = {
-      private_ip  = "10.0.0.16"
-      dns_servers = [ "10.0.0.10", "10.0.0.11" ]
-      nsg         = azurerm_network_security_group.this
-    }
+    private_ip                    = "10.0.0.16"
+    dns_servers                   = [ "10.0.0.10", "10.0.0.11" ]
+    enable_accelerated_networking = true
+    nsg                           = azurerm_network_security_group.this
   }
   virtual_machine_config = {
     hostname             = "CUSTAPP007"
@@ -39,7 +38,7 @@ module "virtual_machine" {
   resource_group_name              = azurerm_resource_group.this.name
   subnet                           = azurerm_subnet.this
   additional_network_interface_ids = [azurerm_network_interface.additional_nic_01.id]
-  enable_accelerated_networking    = true
+
   data_disks = {
     shared-01 = {  # Examp. With disk prefix: vm-CUSTAPP007-datadisk-shared-01., Without: vm-CUSTAPP007-shared-01
       lun                       = 1     

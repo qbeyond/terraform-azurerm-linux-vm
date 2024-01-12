@@ -46,7 +46,6 @@ resource "azurerm_linux_virtual_machine" "this" {
   location                        = var.virtual_machine_config.location
   resource_group_name             = var.resource_group_name
   size                            = var.virtual_machine_config.size
-  provision_vm_agent              = true
   admin_username                  = var.virtual_machine_config.admin_username
   admin_password                  = var.admin_password
   disable_password_authentication = length(var.admin_password) > 0 && length(var.public_key) == 0 ? false : true

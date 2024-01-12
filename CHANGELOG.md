@@ -8,16 +8,9 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [1.0.0] - 2024-01-11
 
-Initial code module.
+Initial code that creates a VM.
 
 ### Added
-
-- VM creation.
-  - Multples NIC suppoted.
-  - Network acceleration.
-  - Availavility set.
-  - Proximity placement group.
-- Disk management creation.
 
 ### Changed
  

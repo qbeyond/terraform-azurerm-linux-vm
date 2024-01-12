@@ -35,8 +35,8 @@ resource "azurerm_network_interface" "this" {
 }
 
 resource "azurerm_network_interface_security_group_association" "this" {
-  count = var.nic_config.nsg != null ? 1 : 0
-  network_interface_id = azurerm_network_interface.this.id
+  count                     = var.nic_config.nsg != null ? 1 : 0
+  network_interface_id      = azurerm_network_interface.this.id
   network_security_group_id = var.nic_config.nsg.id
 }
 
@@ -63,7 +63,7 @@ resource "azurerm_linux_virtual_machine" "this" {
     name                      = local.os_disk_name
     caching                   = var.virtual_machine_config.os_disk_caching
     disk_size_gb              = var.virtual_machine_config.os_disk_size_gb
-    storage_account_type      = var.virtual_machine_config.os_disk_storage_type    
+    storage_account_type      = var.virtual_machine_config.os_disk_storage_type
     write_accelerator_enabled = var.virtual_machine_config.write_accelerator_enabled
   }
 

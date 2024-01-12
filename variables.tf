@@ -1,13 +1,13 @@
 variable "public_ip_config" {
   type = object({
-      enabled           = bool
-      allocation_method = optional(string, "Static")
+    enabled           = bool
+    allocation_method = optional(string, "Static")
   })
   default = {
     enabled = false
   }
   validation {
-    condition     =  contains(["Static","Dynamic"], var.public_ip_config.allocation_method)
+    condition     = contains(["Static", "Dynamic"], var.public_ip_config.allocation_method)
     error_message = "Allocation method must be Static or Dynamic"
   }
   description = <<-DOC
@@ -16,7 +16,7 @@ variable "public_ip_config" {
     allocation_method: The allocation method of the public ip that will be created. Defaults to static.      
   ```
   DOC
-} 
+}
 
 # nsg needs to be an object to use the count object in main.tf. 
 variable "nic_config" {
@@ -50,7 +50,7 @@ variable "additional_network_interface_ids" {
 }
 
 variable "subnet" {
-  type               = object ({
+  type = object({
     id               = string
     address_prefixes = list(string)
   })
@@ -59,33 +59,34 @@ variable "subnet" {
 
 variable "virtual_machine_config" {
   type = object({
-      hostname                     = string
-      size                         = string
-      location                     = string
-      admin_username               = optional(string, "loc_sysadmin")
-      os_sku                       = optional(string, "22_04-lts-gen2")
-      os_offer                     = optional(string, "0001-com-ubuntu-server-jammy")
-      os_version                   = optional(string, "latest")
-      os_publisher                 = optional(string, "Canonical")
-      os_disk_caching              = optional(string, "ReadWrite")
-      os_disk_size_gb              = optional(number, 64)
-      os_disk_storage_type         = optional(string, "StandardSSD_LRS")
-      zone                         = optional(string)
-      availability_set_id          = optional(string)
-      write_accelerator_enabled    = optional(bool, false)
-      proximity_placement_group_id = optional(string)
-      tags                         = optional(map(string))
+    hostname                     = string
+    size                         = string
+    location                     = string
+    admin_username               = optional(string, "loc_sysadmin")
+    os_sku                       = optional(string, "22_04-lts-gen2")
+    os_offer                     = optional(string, "0001-com-ubuntu-server-jammy")
+    os_version                   = optional(string, "latest")
+    os_publisher                 = optional(string, "Canonical")
+    os_disk_caching              = optional(string, "ReadWrite")
+    os_disk_size_gb              = optional(number, 64)
+    os_disk_storage_type         = optional(string, "StandardSSD_LRS")
+    zone                         = optional(string)
+    availability_set_id          = optional(string)
+    write_accelerator_enabled    = optional(bool, false)
+    proximity_placement_group_id = optional(string)
+    tags                         = optional(map(string))
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
-    error_message = "Possible values are None, ReadOnly and ReadWrite" 
+    error_message = "Possible values are None, ReadOnly and ReadWrite"
   }
   validation {
-    condition     = contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"],var.virtual_machine_config.os_disk_storage_type)
+    condition     = contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type)
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS"
   }
   description = <<-DOC
   ```
+    hostname: Name of system hostname.
     size: The size of the vm. Possible values can be seen here: https://learn.microsoft.com/en-us/azure/virtual-machines/sizes
     location: The location of the virtual machine.
     admin_username: Optionally choose the admin_username of the vm. Defaults to loc_sysadmin. 
@@ -143,16 +144,16 @@ variable "data_disks" { # change to map of objects
     storage_account_type       = optional(string, "StandardSSD_LRS")
     write_accelerator_enabled  = optional(bool, false)
     on_demand_bursting_enabled = optional(bool, false)
- }))
- validation {
-   condition     = length([for v in var.data_disks : v.lun]) == length(distinct([for v in var.data_disks : v.lun]))
-   error_message = "One or more of the lun parameters in the map are duplicates."
- }
+  }))
+  validation {
+    condition     = length([for v in var.data_disks : v.lun]) == length(distinct([for v in var.data_disks : v.lun]))
+    error_message = "One or more of the lun parameters in the map are duplicates."
+  }
   validation {
     condition     = alltrue([for o in var.data_disks : contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], o.storage_account_type)])
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS"
-   }
-  default = {}
+  }
+  default     = {}
   description = <<-DOC
   ```
    <name of the data disk> = {
@@ -178,23 +179,23 @@ variable "resource_group_name" {
 
 variable "name_overrides" {
   type = object({
-      nic             = optional(string)
-      nic_ip_config   = optional(string)
-      public_ip       = optional(string)
-      virtual_machine = optional(string)
-      os_disk         = optional(string)
-      data_disks      = optional(map(string), {})
+    nic             = optional(string)
+    nic_ip_config   = optional(string)
+    public_ip       = optional(string)
+    virtual_machine = optional(string)
+    os_disk         = optional(string)
+    data_disks      = optional(map(string), {})
   })
   description = "Possibility to override names that will be generated according to q.beyond naming convention."
-  default = {}
+  default     = {}
 }
 
 variable "log_analytics_agent" {
   type = object({
     workspace_id       = string
-    primary_shared_key = string 
+    primary_shared_key = string
   })
-  sensitive   = true 
+  sensitive   = true
   default     = null
   description = <<-DOC
   ```

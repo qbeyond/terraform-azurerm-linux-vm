@@ -32,8 +32,9 @@ module "virtual_machine" {
     tags = {
       "Environment" = "prd" 
     }
-    availability_set_id        = azurerm_availability_set.this.id # Not compatible with zone.
-    write_accelerator_enabled  = false
+    availability_set_id          = azurerm_availability_set.this.id # Not compatible with zone.
+    write_accelerator_enabled    = false
+    proximity_placement_group_id = azurerm_proximity_placement_group.this.id
   }
   resource_group_name              = azurerm_resource_group.this.name
   subnet                           = azurerm_subnet.this
@@ -81,16 +82,16 @@ resource "azurerm_subnet" "this" {
 }
 
 resource "azurerm_availability_set" "this" {
-  name                = local.availability_set_name
-  location            = local.location
-  resource_group_name = azurerm_resource_group.this.name
+  name                         = local.availability_set_name
+  location                     = local.location
+  resource_group_name          = azurerm_resource_group.this.name
+  proximity_placement_group_id = azurerm_proximity_placement_group.this.id
 }
 
 resource "azurerm_proximity_placement_group" "this" {
   name                = local.proximity_placement_group_name
   location            = local.location
   resource_group_name = azurerm_resource_group.this.name
-  allowed_vm_sizes    = ["Standard_DS1_v2", "Standard_M32ms_v2", "Standard_E16as_v5", "Standard_E8as_v5"]
   
   lifecycle {
       ignore_changes = [tags]
@@ -102,7 +103,6 @@ resource "azurerm_network_interface" "additional_nic_01" {
   location                      = local.location
   resource_group_name           = azurerm_resource_group.this.name
   dns_servers                   = []
-  enable_accelerated_networking = true
 
   ip_configuration {
     name                          = "ip-nic-01"

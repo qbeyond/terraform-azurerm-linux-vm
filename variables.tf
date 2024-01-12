@@ -137,7 +137,6 @@ variable "data_disks" { # change to map of objects
   type = map(object({
     lun                        = number
     disk_size_gb               = number
-    tier                       = optional(string)
     zone                       = optional(string)
     caching                    = optional(string, "ReadWrite")
     create_option              = optional(string, "Empty")
@@ -159,7 +158,6 @@ variable "data_disks" { # change to map of objects
    <name of the data disk> = {
     lun: Number of the lun.
     disk_size_gb: The size of the data disk.
-    tier: Optional. The disk performance tier to use. Possible values are documented here. This feature is currently supported only for premium SSDs.
     zone: Optionally specify an availibility zone for the vm. Values 1, 2 or 3.
     storage_account_type: Optionally change the storage_account_type. Defaults to StandardSSD_LRS.
     caching: Optionally activate disk caching. Defaults to None.

@@ -43,7 +43,6 @@ module "virtual_machine" {
   data_disks = {
     shared-01 = {  # Examp. With disk prefix: vm-CUSTAPP007-datadisk-shared-01., Without: vm-CUSTAPP007-shared-01
       lun                       = 1     
-      tier                      = "P4"
       caching                   = "ReadWrite"
       disk_size_gb              = 32
       create_option             = "Empty"

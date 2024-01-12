@@ -76,11 +76,10 @@ module "virtual_machine" {
     allocation_method = "Static"
   }
   nic_config = {
-    nic1 = {
-      private_ip  = "10.0.0.16"
-  #    dns_servers = [ "10.0.0.10", "10.0.0.11" ]
-  #    nsg         = azurerm_network_security_group.this
-    }
+    private_ip                    = "10.0.0.16"
+    dns_servers                   = [ "10.0.0.10", "10.0.0.11" ]
+    enable_accelerated_networking = true
+    nsg                           = azurerm_network_security_group.this
   }
   virtual_machine_config = {
     hostname             = "CUSTAPP007"
@@ -114,6 +113,7 @@ module "virtual_machine" {
    data_disks = {                         
     shared-01 = {                        # Name should be: vm-CUSTAPP001-datadisk-shared-01, or use name_override
       lun                        = 1     
+      tier                       = "P4"
       caching                    = "ReadWrite"
       disk_size_gb               = 32
       create_option              = "Empty"
@@ -123,6 +123,7 @@ module "virtual_machine" {
     }
     sap-01 = {
       lun                        = 2
+      tier                       = "P4"
       caching                    = "ReadWrite"
       disk_size_gb               = 32
       create_option              = "Empty"
@@ -234,7 +235,6 @@ resource "azurerm_network_security_group" "this" {
 | <a name="input_additional_network_interface_ids"></a> [additional\_network\_interface\_ids](#input\_additional\_network\_interface\_ids) | List of ids for additional azurerm\_network\_interface. | `list(string)` | `[]` | no |
 | <a name="input_admin_password"></a> [admin\_password](#input\_admin\_password) | Password of the local administrator. | `string` | `""` | no |
 | <a name="input_data_disks"></a> [data\_disks](#input\_data\_disks) | <pre><name of the data disk> = {<br>  lun: Number of the lun.<br>  disk_size_gb: The size of the data disk.<br>  zone: Optionally specify an availibility zone for the vm. Values 1, 2 or 3.<br>  storage_account_type: Optionally change the storage_account_type. Defaults to StandardSSD_LRS.<br>  caching: Optionally activate disk caching. Defaults to None.<br>  create_option: Optionally change the create option. Defaults to Empty disk.<br>  write_accelerator_enabled: Optionally activate write accelaration for the data disk. Can only<br>    be activated on Premium_LRS disks and caching deactivated. Defaults to false.<br>  on_demand_bursting_enabled: Optionally activate disk bursting. . Only for Premium disk. Default false.<br> }</pre> | <pre>map(object({<br>    lun                        = number<br>    disk_size_gb               = number<br>    zone                       = optional(string)<br>    caching                    = optional(string, "ReadWrite")<br>    create_option              = optional(string, "Empty")<br>    storage_account_type       = optional(string, "StandardSSD_LRS")<br>    write_accelerator_enabled  = optional(bool, false)<br>    on_demand_bursting_enabled = optional(bool, false)<br> }))</pre> | `{}` | no |
-| <a name="input_enable_accelerated_networking"></a> [enable\_accelerated\_networking](#input\_enable\_accelerated\_networking) | Enabled Accelerated networking (SR-IOV) on the NIC. The machine SKU must support this feature. | `bool` | `"false"` | no |
 | <a name="input_log_analytics_agent"></a> [log\_analytics\_agent](#input\_log\_analytics\_agent) | <pre>Installs the log analytics agent(MicrosoftMonitoringAgent).<br>  workspace_id: Specify id of the log analytics workspace to which monitoring data will be sent.<br>  shared_key: The Primary shared key for the Log Analytics Workspace..</pre> | <pre>object({<br>    workspace_id       = string<br>    primary_shared_key = string <br>  })</pre> | `null` | no |
 | <a name="input_name_overrides"></a> [name\_overrides](#input\_name\_overrides) | Possibility to override names that will be generated according to q.beyond naming convention. | <pre>object({<br>      nic             = optional(string)<br>      nic_ip_config   = optional(string)<br>      public_ip       = optional(string)<br>      virtual_machine = optional(string)<br>      os_disk         = optional(string)<br>      data_disks      = optional(map(string), {})<br>  })</pre> | `{}` | no |
 | <a name="input_nic_config"></a> [nic\_config](#input\_nic\_config) | <pre>private_ip: Optioanlly specify a private ip to use. Otherwise it will  be allocated dynamically.<br>  dns_servers: Optionally specify a list of dns servers for the nic.<br>  enable_accelerated_networking: Enabled Accelerated networking (SR-IOV) on the NIC. The machine SKU must support this feature.<br>  nsg_id: Optinally specify the id of a network security group that will be assigned to the nic.</pre> | <pre>object({<br>    private_ip  = optional(string)<br>    dns_servers = optional(list(string))<br>    nsg = optional(object({<br>      id = string<br>    }))<br>  })</pre> | `{}` | no |

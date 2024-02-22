@@ -53,20 +53,46 @@ variable "subnet" {
   description = "The variable takes the subnet as input and takes the id and the address prefix for further configuration."
 }
 
+variable "admin_credential" {
+  type = object({
+    admin_username                  = optional(string, "loc_sysadmin")
+    admin_password                  = optional(string)
+    public_key                      = optional(string)
+    disable_password_authentication = optional(bool, true)
+  })
+  validation {
+    condition     = (var.admin_credential.admin_password != null && var.admin_credential.disable_password_authentication == false) || (var.admin_credential.admin_password == null && var.admin_credential.disable_password_authentication == true)
+    error_message = "If use admin password, set disable_password_authentication to false."
+  }
+  validation {
+    condition     = (var.admin_credential.admin_password != null && var.admin_credential.public_key == null) || (var.admin_credential.admin_password == null && var.admin_credential.public_key != null)
+    error_message = "Use admin password or public ssh key."
+  }
+  sensitive   = true
+  description = <<-DOC
+  ```
+    admin_username: Optionally choose the admin_username of the vm. Defaults to loc_sysadmin. 
+      The local admin name could be changed by the gpo in the target ad.
+    admin_password: Password of the local administrator.
+    public_key: SSH public key file (e.g. file(id_rsa.pub)
+    disable_password_authentication: Default to true.
+  ```
+  DOC
+}
+
 variable "virtual_machine_config" {
   type = object({
     hostname                     = string
     size                         = string
     location                     = string
-    admin_username               = optional(string, "loc_sysadmin")
     os_sku                       = string
-    os_offer                     = optional(string)
-    os_version                   = optional(string, "latest")
-    os_publisher                 = optional(string)
+    os_offer                     = string
+    os_version                   = string
+    os_publisher                 = string
     os_disk_caching              = optional(string, "ReadWrite")
-    os_disk_size_gb              = optional(number, 64)
-    os_disk_storage_type         = optional(string, "Premium_LRS")
-    zone                         = optional(string)
+    os_disk_size_gb              = optional(number)
+    os_disk_storage_type         = optional(string, "StandardSSD_LRS")
+    zone                         = optional(number)
     availability_set_id          = optional(string)
     write_accelerator_enabled    = optional(bool, false)
     proximity_placement_group_id = optional(string)
@@ -74,30 +100,36 @@ variable "virtual_machine_config" {
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
-    error_message = "Possible values are None, ReadOnly and ReadWrite"
+    error_message = "Possible values are None, ReadOnly and ReadWrite for os_disk_caching."
   }
   validation {
     condition     = contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type)
-    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS"
+    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for os_disk_storage_type."
+  }
+  validation {
+    condition     = (contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && var.virtual_machine_config.write_accelerator_enabled == true  && var.virtual_machine_config.os_disk_caching == "None") || (var.virtual_machine_config.write_accelerator_enabled == false)
+    error_message = "write_accelerator_enabled, can only be activated on Premium disks and caching deactivated."
+  }
+  validation {
+    condition     = var.virtual_machine_config.zone == null || var.virtual_machine_config.zone == 1 || var.virtual_machine_config.zone == 2 || var.virtual_machine_config.zone == 3
+    error_message = "Zone, can only be empty, 1, 2 or 3."
   }
   description = <<-DOC
   ```
     hostname: Name of system hostname.
     size: The size of the vm. Possible values can be seen here: https://learn.microsoft.com/en-us/azure/virtual-machines/sizes
     location: The location of the virtual machine.
-    admin_username: Optionally choose the admin_username of the vm. Defaults to loc_sysadmin. 
-      The local admin name could be changed by the gpo in the target ad.
-    os_sku: The os that will be running on the vm.
+    os_sku: (Required) The os that will be running on the vm.
     os_offer: (Required) Specifies the offer of the image used to create the virtual machines. Changing this forces a new resource to be created.
-    os_version: Optionally specify an os version for the chosen sku. Defaults to latest.
+    os_version: (Required) Optionally specify an os version for the chosen sku.
     os_publisher: (Required) Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from. Changing this forces a new resource to be created.
     os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.
     os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.
-    os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to Premium_LRS.
+    os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.
     zone: Optionally specify an availibility zone for the vm. Values 1, 2 or 3.
-    availability_set_id: Optionally specify an availibility set for the vm.
+    availability_set_id: Optionally specify an availibility set for the vm. Not compatible with zone.
     write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only
-      be activated on Premium_LRS disks and caching deactivated. Defaults to false.
+      be activated on Premium disks and caching deactivated. Defaults to false.
     proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.
     tags: Optionally specify tags in as a map.
   ```
@@ -114,19 +146,6 @@ variable "update_allowed" {
   type        = bool
   default     = true
   description = "Set the tag `Update allowed`. `True` will set `yes`, `false` to `no`."
-}
-
-variable "admin_password" {
-  type        = string
-  sensitive   = true
-  description = "Password of the local administrator."
-  default     = ""
-}
-
-variable "public_key" {
-  type        = string
-  default     = ""
-  description = "SSH public key file (e.g. file(id_rsa.pub)"
 }
 
 variable "data_disks" { # change to map of objects
@@ -148,6 +167,14 @@ variable "data_disks" { # change to map of objects
     condition     = alltrue([for o in var.data_disks : contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], o.storage_account_type)])
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS"
   }
+  validation {
+    condition     = (alltrue([for o in var.data_disks : contains(["Premium_LRS", "Premium_ZRS"], o.storage_account_type)]) && alltrue([for o in var.data_disks : o.write_accelerator_enabled == true]) && alltrue([for o in var.data_disks : o.caching == "None"])) || (alltrue([for o in var.data_disks : o.write_accelerator_enabled == false]))
+    error_message = "write_accelerator_enabled, can only be activated on Premium disks and caching deactivated."
+  }
+  validation {
+    condition     = (alltrue([for o in var.data_disks : contains(["Premium_LRS", "Premium_ZRS"], o.storage_account_type)]) && alltrue([for o in var.data_disks : o.on_demand_bursting_enabled == true])) || (alltrue([for o in var.data_disks : o.on_demand_bursting_enabled == false]))
+    error_message = "If enable on demand bursting, possible storage account type values are Premium_LRS and Premium_ZRS"
+  }
   default     = {}
   description = <<-DOC
   ```
@@ -159,8 +186,8 @@ variable "data_disks" { # change to map of objects
     caching: Optionally activate disk caching. Defaults to None.
     create_option: Optionally change the create option. Defaults to Empty disk.
     write_accelerator_enabled: Optionally activate write accelaration for the data disk. Can only
-      be activated on Premium_LRS disks and caching deactivated. Defaults to false.
-    on_demand_bursting_enabled: Optionally activate disk bursting. . Only for Premium disk. Default false.
+      be activated on Premium disks and caching deactivated. Defaults to false.
+    on_demand_bursting_enabled: Optionally activate disk bursting. Only for Premium disk. Default false.
    }
   ```
   DOC

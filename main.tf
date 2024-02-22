@@ -46,15 +46,17 @@ resource "azurerm_linux_virtual_machine" "this" {
   location                        = var.virtual_machine_config.location
   resource_group_name             = var.resource_group_name
   size                            = var.virtual_machine_config.size
-  admin_username                  = var.virtual_machine_config.admin_username
-  admin_password                  = var.admin_password
-  disable_password_authentication = length(var.admin_password) > 0 && length(var.public_key) == 0 ? false : true
+  admin_username                  = var.admin_credential.admin_username
+  admin_password                  = var.admin_credential.admin_password
+  disable_password_authentication = var.admin_credential.disable_password_authentication
+  #  disable_password_authentication = length(var.virtual_machine_config.admin_password) > 0 && length(var.virtual_machine_config.public_key) == 0 ? false : true
 
   dynamic "admin_ssh_key" {
-    for_each = length(var.public_key) > 0 ? [1] : []
+    #    for_each = length(var.admin_credential.public_key) > 0 ? [1] : []
+    for_each = var.admin_credential.public_key != null ? [1] : []
     content {
-      username   = var.virtual_machine_config.admin_username
-      public_key = var.public_key
+      username   = var.admin_credential.admin_username
+      public_key = var.admin_credential.public_key
     }
   }
 

@@ -4,14 +4,22 @@ provider "azurerm" {
 
 module "virtual_machine" {
     source = "../.."
+
     virtual_machine_config = {
-        hostname       = "CUSTAPP001"
-        location       = local.location
-        admin_username = "local_admin"
-        size           = "Standard_B1ms"
+        hostname     = "CUSTAPP001"
+        location     = local.location
+        size         = "Standard_B1ms"
+        os_sku       = "22_04-lts-gen2"
+        os_offer     = "0001-com-ubuntu-server-jammy"
+        os_version   = "latest"
+        os_publisher = "Canonical"
+    }
+    admin_credential = {
+      admin_username                  = "local_admin"
+      admin_password                  = "H3ll0W0rld!"
+      disable_password_authentication = false
     }
 
-    admin_password      = "H3ll0W0rld!"
     resource_group_name = azurerm_resource_group.this.name
     subnet              = azurerm_subnet.this
 }

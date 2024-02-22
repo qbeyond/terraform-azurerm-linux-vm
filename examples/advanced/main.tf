@@ -5,22 +5,20 @@ provider "azurerm" {
 module "virtual_machine" {
   source = "../.."
   public_ip_config = {
-  enabled           = true
-  allocation_method = "Static"
+    enabled           = true
+    allocation_method = "Static"
   }
-  public_key          = file("id_rsa.pub")
   nic_config = {
     private_ip                    = "10.0.0.16"
-    dns_servers                   = [ "10.0.0.10", "10.0.0.11" ]
     enable_accelerated_networking = true
+    dns_servers                   = [ "10.0.0.10", "10.0.0.11" ]
     nsg                           = azurerm_network_security_group.this
   }
   virtual_machine_config = {
     hostname             = "CUSTAPP007"
-    location             = azurerm_resource_group.this.location
-    zone                 = null # Could be the default value "1", or "2" or "3". Not compatible with availability_set_id enabled.
-    admin_username       = "qbinstall"
-    size                 = "Standard_DS1_v2"
+    location             = local.location
+    size                 = "Standard_B1ms"
+    zone                 = null              # Could be the default value "1", or "2" or "3". Not compatible with availability_set_id enabled.
     os_sku               = "22_04-lts-gen2"
     os_offer             = "0001-com-ubuntu-server-jammy"
     os_version           = "latest"
@@ -28,35 +26,45 @@ module "virtual_machine" {
     os_disk_caching      = "ReadWrite"
     os_disk_storage_type = "StandardSSD_LRS"
     os_disk_size_gb      = 64
-    tags = {
-      "Environment" = "prd" 
-    }
     availability_set_id          = azurerm_availability_set.this.id # Not compatible with zone.
     write_accelerator_enabled    = false
     proximity_placement_group_id = azurerm_proximity_placement_group.this.id
+    tags = {
+      "Environment" = "prd" 
+    }
   }
+  admin_credential = {
+    admin_username = "local_admin"
+    public_key     = file("id_rsa.pub")
+  }
+
   resource_group_name              = azurerm_resource_group.this.name
   subnet                           = azurerm_subnet.this
   additional_network_interface_ids = [azurerm_network_interface.additional_nic_01.id]
+  log_analytics_agent              = azurerm_log_analytics_workspace.this
 
   data_disks = {
-    shared-01 = {  # Examp. With disk prefix: vm-CUSTAPP007-datadisk-shared-01., Without: vm-CUSTAPP007-shared-01
-      lun                       = 1     
-      caching                   = "ReadWrite"
-      disk_size_gb              = 32
-      create_option             = "Empty"
-      storage_account_type      = "StandardSSD_LRS"
-      write_accelerator_enabled = false
+    shared-01 = { # Examp. With disk prefix: vm-CUSTAPP007-datadisk-shared-01., Without: vm-CUSTAPP007-shared-01
+      lun                        = 1
+      tier                       = "P4"
+      caching                    = "None"
+      disk_size_gb               = 32
+      create_option              = "Empty"
+      storage_account_type       = "Premium_LRS"
+      write_accelerator_enabled  = true
+      on_demand_bursting_enabled = true
     }
   }
-
-  log_analytics_agent = azurerm_log_analytics_workspace.this
 
   name_overrides = {
     nic             = local.nic
     nic_ip_config   = local.nic_ip_config
     public_ip       = local.public_ip
     virtual_machine = local.virtual_machine
+    os_disk         = "vm-CUSTAPP007_OsDisk"
+    data_disks = {
+      shared-01 = "vm-CUSTAPP007-datadisk-shared-01"
+    }
   }
 }
 

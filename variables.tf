@@ -220,7 +220,7 @@ variable "log_analytics_agent" {
   ```
     Installs the log analytics agent(MicrosoftMonitoringAgent).
     workspace_id: Specify id of the log analytics workspace to which monitoring data will be sent.
-    shared_key: The Primary shared key for the Log Analytics Workspace..
+    shared_key: The Primary shared key for the Log Analytics Workspace.
   ```
   DOC
 }

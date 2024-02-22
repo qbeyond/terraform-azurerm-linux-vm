@@ -148,11 +148,10 @@ variable "update_allowed" {
   description = "Set the tag `Update allowed`. `True` will set `yes`, `false` to `no`."
 }
 
-variable "data_disks" { # change to map of objects
+variable "data_disks" {
   type = map(object({
     lun                        = number
     disk_size_gb               = number
-    zone                       = optional(string)
     caching                    = optional(string, "ReadWrite")
     create_option              = optional(string, "Empty")
     storage_account_type       = optional(string, "StandardSSD_LRS")
@@ -181,7 +180,6 @@ variable "data_disks" { # change to map of objects
    <name of the data disk> = {
     lun: Number of the lun.
     disk_size_gb: The size of the data disk.
-    zone: Optionally specify an availibility zone for the vm. Values 1, 2 or 3.
     storage_account_type: Optionally change the storage_account_type. Defaults to StandardSSD_LRS.
     caching: Optionally activate disk caching. Defaults to None.
     create_option: Optionally change the create option. Defaults to Empty disk.

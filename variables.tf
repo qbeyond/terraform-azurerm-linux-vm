@@ -177,7 +177,7 @@ variable "data_disks" {
   default     = {}
   description = <<-DOC
   ```
-   <name of the data disk> = {
+   <logical name of the data disk> = {
     lun: Number of the lun.
     disk_size_gb: The size of the data disk.
     storage_account_type: Optionally change the storage_account_type. Defaults to StandardSSD_LRS.

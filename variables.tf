@@ -208,19 +208,3 @@ variable "name_overrides" {
   description = "Possibility to override names that will be generated according to q.beyond naming convention."
   default     = {}
 }
-
-variable "log_analytics_agent" {
-  type = object({
-    workspace_id       = string
-    primary_shared_key = string
-  })
-  sensitive   = true
-  default     = null
-  description = <<-DOC
-  ```
-    Installs the log analytics agent(MicrosoftMonitoringAgent).
-    workspace_id: Specify id of the log analytics workspace to which monitoring data will be sent.
-    shared_key: The Primary shared key for the Log Analytics Workspace.
-  ```
-  DOC
-}

@@ -41,7 +41,6 @@ module "virtual_machine" {
   resource_group_name              = azurerm_resource_group.this.name
   subnet                           = azurerm_subnet.this
   additional_network_interface_ids = [azurerm_network_interface.additional_nic_01.id]
-  log_analytics_agent              = azurerm_log_analytics_workspace.this
 
   data_disks = {
     shared-01 = { # Examp. With disk prefix: vm-CUSTAPP007-datadisk-shared-01., Without: vm-CUSTAPP007-shared-01
@@ -141,12 +140,4 @@ resource "azurerm_network_security_group" "this" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
-}
-
-resource "azurerm_log_analytics_workspace" "this" {
-  name                = local.law_name
-  location            = local.location
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "PerGB2018"
-  retention_in_days    = 30
 }

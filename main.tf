@@ -4,12 +4,7 @@ resource "azurerm_public_ip" "this" {
   resource_group_name = var.resource_group_name
   location            = var.virtual_machine_config.location
   allocation_method   = var.public_ip_config.allocation_method
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
+  tags                = var.tags
 }
 
 resource "azurerm_network_interface" "this" {
@@ -18,6 +13,7 @@ resource "azurerm_network_interface" "this" {
   resource_group_name           = var.resource_group_name
   dns_servers                   = var.nic_config.dns_servers
   enable_accelerated_networking = var.nic_config.enable_accelerated_networking
+  tags                          = var.tags
 
   ip_configuration {
     name                          = local.nic.ip_config_name
@@ -25,12 +21,6 @@ resource "azurerm_network_interface" "this" {
     private_ip_address_allocation = var.nic_config.private_ip == null ? "Dynamic" : "Static"
     private_ip_address            = var.nic_config.private_ip
     public_ip_address_id          = var.public_ip_config.enabled ? azurerm_public_ip.this[0].id : null
-  }
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
   }
 }
 
@@ -49,7 +39,6 @@ resource "azurerm_linux_virtual_machine" "this" {
   admin_username                  = var.admin_credential.admin_username
   admin_password                  = var.admin_credential.admin_password
   disable_password_authentication = var.admin_credential.disable_password_authentication
-  #  disable_password_authentication = length(var.virtual_machine_config.admin_password) > 0 && length(var.virtual_machine_config.public_key) == 0 ? false : true
 
   dynamic "admin_ssh_key" {
     #    for_each = length(var.admin_credential.public_key) > 0 ? [1] : []

@@ -1,6 +1,6 @@
 locals {
   public_ip = {
-    name = coalesce(var.name_overrides.public_ip, "pip-vm-${var.virtual_machine_config.hostname}") # change to naming convention= 
+    name = coalesce(var.name_overrides.public_ip, "pip-${var.stage}-${var.virtual_machine_config.hostname}-01-${var.virtual_machine_config.location}")
   }
 
   nic = {
@@ -10,7 +10,7 @@ locals {
 
   virtual_machine = {
     name = coalesce(var.name_overrides.virtual_machine, "vm-${var.virtual_machine_config.hostname}")
-    tags = merge(var.virtual_machine_config.tags, { "Severity Group Monthly" = var.severity_group }, { "Update allowed" = local.update_allowed })
+    tags = merge(var.tags, { "Severity Group Monthly" = var.severity_group }, { "Update allowed" = local.update_allowed })
   }
   os_disk_name   = coalesce(var.name_overrides.os_disk, "disk-${var.virtual_machine_config.hostname}-Os")
   update_allowed = var.update_allowed ? "yes" : "no"

@@ -1,4 +1,4 @@
-# Module
+# Linux VM
 [![GitHub tag](https://img.shields.io/github/tag/qbeyond/terraform-azurerm-linux-vm.svg)](https://registry.terraform.io/modules/qbeyond/linux-vm/azurerm/latest)
 [![License](https://img.shields.io/github/license/qbeyond/terraform-azurerm-linux-vm.svg)](https://github.com/qbeyond/terraform-azurerm-linux-vm/blob/main/LICENSE)
 

@@ -96,7 +96,6 @@ variable "virtual_machine_config" {
     availability_set_id          = optional(string)
     write_accelerator_enabled    = optional(bool, false)
     proximity_placement_group_id = optional(string)
-    tags                         = optional(map(string))
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
@@ -131,7 +130,6 @@ variable "virtual_machine_config" {
     write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only
       be activated on Premium disks and caching deactivated. Defaults to false.
     proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.
-    tags: Optionally specify tags in as a map.
   ```
   DOC
 }
@@ -207,4 +205,15 @@ variable "name_overrides" {
   })
   description = "Possibility to override names that will be generated according to q.beyond naming convention."
   default     = {}
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "A map of tags that will be set on every resource this module creates."
+  default     = {}
+}
+
+variable "stage" {
+  type        = string
+  description = "The stage of this VM like prd, dev, tst, ..."
 }

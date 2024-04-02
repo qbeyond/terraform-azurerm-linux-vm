@@ -8,10 +8,8 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [1.0.0] - 2024-01-11
 
-Initial code that creates a VM.
-
 ### Added
-
+ - Initial code that creates a VM
 ### Changed
  
 ### Removed

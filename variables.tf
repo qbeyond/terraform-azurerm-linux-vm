@@ -53,9 +53,14 @@ variable "subnet" {
   description = "The variable takes the subnet as input and takes the id and the address prefix for further configuration."
 }
 
+variable "admin_username" {
+  type = string
+  description = "Optionally choose the admin_username of the vm. Defaults to loc_sysadmin."
+  default = "loc_sysadmin"
+}
+
 variable "admin_credential" {
   type = object({
-    admin_username = optional(string, "loc_sysadmin")
     admin_password = optional(string)
     public_key     = optional(string)
   })
@@ -67,10 +72,8 @@ variable "admin_credential" {
   sensitive   = true
   description = <<-DOC
   ```
-    admin_username: Optionally choose the admin_username of the vm. Defaults to loc_sysadmin. 
     admin_password: Password of the local administrator.
     public_key: SSH public key file (e.g. file(id_rsa.pub)
-    disable_password_authentication: Default to true.
   ```
   DOC
 }
@@ -91,6 +94,7 @@ variable "virtual_machine_config" {
     availability_set_id          = optional(string)
     write_accelerator_enabled    = optional(bool, false)
     proximity_placement_group_id = optional(string)
+    severity_group               = string
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
@@ -127,11 +131,6 @@ variable "virtual_machine_config" {
     proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.
   ```
   DOC
-}
-
-variable "severity_group" {
-  type        = string
-  description = "The severity group of the virtual machine."
 }
 
 variable "update_allowed" {

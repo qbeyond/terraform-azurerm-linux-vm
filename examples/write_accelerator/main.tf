@@ -51,7 +51,7 @@ module "virtual_machine" {
       disk_size_gb               = 513
       create_option              = "Empty"
       storage_account_type       = "Premium_LRS"
-      write_accelerator_enabled  = false
+      write_accelerator_enabled  = true
       on_demand_bursting_enabled = true
     }
   }

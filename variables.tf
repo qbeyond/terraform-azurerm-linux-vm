@@ -55,15 +55,11 @@ variable "subnet" {
 
 variable "admin_credential" {
   type = object({
-    admin_username                  = optional(string, "loc_sysadmin")
-    admin_password                  = optional(string)
-    public_key                      = optional(string)
-    disable_password_authentication = optional(bool, true)
+    admin_username = optional(string, "loc_sysadmin")
+    admin_password = optional(string)
+    public_key     = optional(string)
   })
-  validation {
-    condition     = (var.admin_credential.admin_password != null && var.admin_credential.disable_password_authentication == false) || (var.admin_credential.admin_password == null && var.admin_credential.disable_password_authentication == true)
-    error_message = "If use admin password, set disable_password_authentication to false."
-  }
+
   validation {
     condition     = (var.admin_credential.admin_password != null && var.admin_credential.public_key == null) || (var.admin_credential.admin_password == null && var.admin_credential.public_key != null)
     error_message = "Use admin password or public ssh key."
@@ -72,7 +68,6 @@ variable "admin_credential" {
   description = <<-DOC
   ```
     admin_username: Optionally choose the admin_username of the vm. Defaults to loc_sysadmin. 
-      The local admin name could be changed by the gpo in the target ad.
     admin_password: Password of the local administrator.
     public_key: SSH public key file (e.g. file(id_rsa.pub)
     disable_password_authentication: Default to true.
@@ -106,7 +101,7 @@ variable "virtual_machine_config" {
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for os_disk_storage_type."
   }
   validation {
-    condition     = (contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && var.virtual_machine_config.write_accelerator_enabled == true  && var.virtual_machine_config.os_disk_caching == "None") || (var.virtual_machine_config.write_accelerator_enabled == false)
+    condition     = (contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && var.virtual_machine_config.write_accelerator_enabled == true && var.virtual_machine_config.os_disk_caching == "None") || (var.virtual_machine_config.write_accelerator_enabled == false)
     error_message = "write_accelerator_enabled, can only be activated on Premium disks and caching deactivated."
   }
   validation {
@@ -136,7 +131,6 @@ variable "virtual_machine_config" {
 
 variable "severity_group" {
   type        = string
-  default     = ""
   description = "The severity group of the virtual machine."
 }
 
@@ -165,13 +159,20 @@ variable "data_disks" {
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for storage_account_type"
   }
   validation {
-    condition     = (alltrue([for o in var.data_disks : contains(["Premium_LRS", "Premium_ZRS"], o.storage_account_type)]) && alltrue([for o in var.data_disks : o.write_accelerator_enabled == true]) && alltrue([for o in var.data_disks : o.caching == "None"])) || (alltrue([for o in var.data_disks : o.write_accelerator_enabled == false]))
+    condition = alltrue([for o in var.data_disks : (
+      (o.write_accelerator_enabled == true && contains(["Premium_LRS", "Premium_ZRS"], o.storage_account_type) && contains(["None", "ReadOnly"], o.caching)) ||
+      (o.write_accelerator_enabled == false)
+    )])
     error_message = "write_accelerator_enabled, can only be activated on Premium disks and caching deactivated."
   }
   validation {
-    condition     = (alltrue([for o in var.data_disks : contains(["Premium_LRS", "Premium_ZRS"], o.storage_account_type)]) && alltrue([for o in var.data_disks : o.on_demand_bursting_enabled == true])) || (alltrue([for o in var.data_disks : o.on_demand_bursting_enabled == false]))
+    condition = alltrue([for o in var.data_disks : (
+      (o.on_demand_bursting_enabled == true && contains(["Premium_LRS", "Premium_ZRS"], o.storage_account_type)) ||
+      (o.on_demand_bursting_enabled == false)
+    )])
     error_message = "If enable on demand bursting, possible storage_account_type values are Premium_LRS and Premium_ZRS."
   }
+
   default     = {}
   description = <<-DOC
   ```

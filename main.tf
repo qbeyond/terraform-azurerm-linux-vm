@@ -38,7 +38,8 @@ resource "azurerm_linux_virtual_machine" "this" {
   size                            = var.virtual_machine_config.size
   admin_username                  = var.admin_credential.admin_username
   admin_password                  = var.admin_credential.admin_password
-  disable_password_authentication = var.admin_credential.disable_password_authentication
+  disable_password_authentication = var.admin_credential.admin_password == null 
+
 
   dynamic "admin_ssh_key" {
     #    for_each = length(var.admin_credential.public_key) > 0 ? [1] : []

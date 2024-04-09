@@ -6,6 +6,7 @@ variable "public_ip_config" {
   default = {
     enabled = false
   }
+  nullable = false
   validation {
     condition     = contains(["Static", "Dynamic"], var.public_ip_config.allocation_method)
     error_message = "Allocation method must be Static or Dynamic"
@@ -29,6 +30,7 @@ variable "nic_config" {
     }))
   })
   default     = {}
+  nullable    = false
   description = <<-DOC
   ```
     private_ip: Optioanlly specify a private ip to use. Otherwise it will  be allocated dynamically.
@@ -42,6 +44,7 @@ variable "nic_config" {
 variable "additional_network_interface_ids" {
   type        = list(string)
   default     = []
+  nullable    = false
   description = "List of ids for additional azurerm_network_interface."
 }
 
@@ -50,13 +53,15 @@ variable "subnet" {
     id               = string
     address_prefixes = list(string)
   })
+  nullable    = false
   description = "The variable takes the subnet as input and takes the id and the address prefix for further configuration."
 }
 
 variable "admin_username" {
   type        = string
-  description = "Optionally choose the admin_username of the vm. Defaults to loc_sysadmin."
   default     = "loc_sysadmin"
+  nullable    = false
+  description = "Optionally choose the admin_username of the vm. Defaults to loc_sysadmin."
 }
 
 variable "admin_credential" {
@@ -72,6 +77,7 @@ variable "admin_credential" {
   sensitive   = true
   description = <<-DOC
   ```
+    Specify either admin_password or public_key:
     admin_password: Password of the local administrator.
     public_key: SSH public key file (e.g. file(id_rsa.pub))
   ```
@@ -112,6 +118,7 @@ variable "virtual_machine_config" {
     condition     = var.virtual_machine_config.zone == null || var.virtual_machine_config.zone == 1 || var.virtual_machine_config.zone == 2 || var.virtual_machine_config.zone == 3
     error_message = "Zone, can only be empty, 1, 2 or 3."
   }
+  nullable    = false
   description = <<-DOC
   ```
     hostname: Name of system hostname.
@@ -137,6 +144,7 @@ variable "virtual_machine_config" {
 variable "update_allowed" {
   type        = bool
   default     = true
+  nullable    = false
   description = "Set the tag `Update allowed`. `True` will set `yes`, `false` to `no`."
 }
 
@@ -178,6 +186,7 @@ variable "data_disks" {
   }
 
   default     = {}
+  nullable    = false
   description = <<-DOC
   ```
    <logical name of the data disk> = {
@@ -196,6 +205,7 @@ variable "data_disks" {
 
 variable "resource_group_name" {
   type        = string
+  nullable    = false
   description = "Name of the resource group where the resources will be created."
 }
 
@@ -208,17 +218,20 @@ variable "name_overrides" {
     os_disk         = optional(string)
     data_disks      = optional(map(string), {})
   })
-  description = "Possibility to override names that will be generated according to q.beyond naming convention."
   default     = {}
+  nullable    = false
+  description = "Possibility to override names that will be generated according to q.beyond naming convention."
 }
 
 variable "tags" {
   type        = map(string)
-  description = "A map of tags that will be set on every resource this module creates."
   default     = {}
+  nullable    = false
+  description = "A map of tags that will be set on every resource this module creates."
 }
 
 variable "stage" {
   type        = string
+  nullable    = false
   description = "The stage of this VM like prd, dev, tst, ..."
 }

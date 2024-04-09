@@ -38,11 +38,10 @@ resource "azurerm_linux_virtual_machine" "this" {
   size                            = var.virtual_machine_config.size
   admin_username                  = var.admin_username
   admin_password                  = var.admin_credential.admin_password
-  disable_password_authentication = var.admin_credential.admin_password == null 
+  disable_password_authentication = var.admin_credential.admin_password == null
 
 
   dynamic "admin_ssh_key" {
-    #    for_each = length(var.admin_credential.public_key) > 0 ? [1] : []
     for_each = var.admin_credential.public_key != null ? [1] : []
     content {
       username   = var.admin_username
@@ -55,7 +54,7 @@ resource "azurerm_linux_virtual_machine" "this" {
     caching                   = var.virtual_machine_config.os_disk_caching
     disk_size_gb              = var.virtual_machine_config.os_disk_size_gb
     storage_account_type      = var.virtual_machine_config.os_disk_storage_type
-    write_accelerator_enabled = var.virtual_machine_config.write_accelerator_enabled
+    write_accelerator_enabled = var.virtual_machine_config.os_disk_write_accelerator_enabled
   }
 
   source_image_reference {

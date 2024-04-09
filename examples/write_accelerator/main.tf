@@ -21,7 +21,7 @@ module "virtual_machine" {
   stage = "tst"
 
   data_disks = {
-    shared-01 = {
+    shared01 = {
       lun                        = 1
       tier                       = "P4"
       caching                    = "ReadOnly"
@@ -31,7 +31,7 @@ module "virtual_machine" {
       write_accelerator_enabled  = true
       on_demand_bursting_enabled = true
     }
-    shared-02 = {
+    shared02 = {
       lun                        = 2
       tier                       = "P4"
       caching                    = "None"
@@ -41,7 +41,7 @@ module "virtual_machine" {
       write_accelerator_enabled  = true
       on_demand_bursting_enabled = true
     }
-    shared-03 = {
+    shared03 = {
       lun                        = 3
       tier                       = "P4"
       caching                    = "ReadWrite"

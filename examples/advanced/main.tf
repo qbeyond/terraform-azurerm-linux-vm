@@ -32,7 +32,7 @@ module "virtual_machine" {
     os_disk_storage_type         = "StandardSSD_LRS"
     os_disk_size_gb              = 64
     availability_set_id          = azurerm_availability_set.this.id # Not compatible with zone.
-    write_accelerator_enabled    = false
+    os_disk_write_accelerator_enabled    = false
     proximity_placement_group_id = azurerm_proximity_placement_group.this.id
     severity_group               = "01-second-monday-0300-XCSUFEDTG-reboot"
     tags = {
@@ -49,7 +49,7 @@ module "virtual_machine" {
   additional_network_interface_ids = [azurerm_network_interface.additional_nic_01.id]
 
   data_disks = {
-    shared-01 = { # Examp. With disk prefix: vm-CUSTAPP007-datadisk-shared-01., Without: vm-CUSTAPP007-shared-01
+    shared01 = {
       lun                        = 1
       tier                       = "P4"
       caching                    = "None"
@@ -93,7 +93,7 @@ resource "azurerm_subnet" "this" {
 }
 
 resource "azurerm_availability_set" "this" {
-  name                         = local.availability_set_name
+  name                         = "avs-example-01"
   location                     = azurerm_resource_group.this.location
   resource_group_name          = azurerm_resource_group.this.name
   proximity_placement_group_id = azurerm_proximity_placement_group.this.id

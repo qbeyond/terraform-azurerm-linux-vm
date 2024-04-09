@@ -15,10 +15,9 @@ module "virtual_machine" {
     os_publisher   = "Canonical"
     severity_group = "01-second-monday-0300-XCSUFEDTG-reboot"
   }
+  admin_username = "local_admin"
   admin_credential = {
-    admin_username                  = "local_admin"
-    admin_password                  = "H3ll0W0rld!"
-    disable_password_authentication = false
+    admin_password = "H3ll0W0rld!"
   }
   stage = "tst"
 

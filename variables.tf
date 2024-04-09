@@ -54,9 +54,9 @@ variable "subnet" {
 }
 
 variable "admin_username" {
-  type = string
+  type        = string
   description = "Optionally choose the admin_username of the vm. Defaults to loc_sysadmin."
-  default = "loc_sysadmin"
+  default     = "loc_sysadmin"
 }
 
 variable "admin_credential" {
@@ -73,28 +73,28 @@ variable "admin_credential" {
   description = <<-DOC
   ```
     admin_password: Password of the local administrator.
-    public_key: SSH public key file (e.g. file(id_rsa.pub)
+    public_key: SSH public key file (e.g. file(id_rsa.pub))
   ```
   DOC
 }
 
 variable "virtual_machine_config" {
   type = object({
-    hostname                     = string
-    size                         = string
-    location                     = string
-    os_sku                       = string
-    os_offer                     = string
-    os_version                   = string
-    os_publisher                 = string
-    os_disk_caching              = optional(string, "ReadWrite")
-    os_disk_size_gb              = optional(number)
-    os_disk_storage_type         = optional(string, "StandardSSD_LRS")
-    zone                         = optional(number)
-    availability_set_id          = optional(string)
-    write_accelerator_enabled    = optional(bool, false)
-    proximity_placement_group_id = optional(string)
-    severity_group               = string
+    hostname                          = string
+    size                              = string
+    location                          = string
+    os_sku                            = string
+    os_offer                          = string
+    os_version                        = string
+    os_publisher                      = string
+    os_disk_caching                   = optional(string, "ReadWrite")
+    os_disk_size_gb                   = optional(number)
+    os_disk_storage_type              = optional(string, "StandardSSD_LRS")
+    os_disk_write_accelerator_enabled = optional(bool, false)
+    zone                              = optional(number)
+    availability_set_id               = optional(string)
+    proximity_placement_group_id      = optional(string)
+    severity_group                    = string
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
@@ -105,8 +105,8 @@ variable "virtual_machine_config" {
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for os_disk_storage_type."
   }
   validation {
-    condition     = (contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && var.virtual_machine_config.write_accelerator_enabled == true && var.virtual_machine_config.os_disk_caching == "None") || (var.virtual_machine_config.write_accelerator_enabled == false)
-    error_message = "write_accelerator_enabled, can only be activated on Premium disks and caching deactivated."
+    condition     = (contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && var.virtual_machine_config.os_disk_write_accelerator_enabled == true && var.virtual_machine_config.os_disk_caching == "None") || (var.virtual_machine_config.os_disk_write_accelerator_enabled == false)
+    error_message = "os_disk_write_accelerator_enabled, can only be activated on Premium disks and caching deactivated."
   }
   validation {
     condition     = var.virtual_machine_config.zone == null || var.virtual_machine_config.zone == 1 || var.virtual_machine_config.zone == 2 || var.virtual_machine_config.zone == 3
@@ -126,9 +126,10 @@ variable "virtual_machine_config" {
     os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.
     zone: Optionally specify an availibility zone for the vm. Values 1, 2 or 3.
     availability_set_id: Optionally specify an availibility set for the vm. Not compatible with zone.
-    write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only
+    os_disk_write_accelerator_enabled: Optionally activate write accelaration for the os disk. Can only
       be activated on Premium disks and caching deactivated. Defaults to false.
     proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.
+    severity_group: (Required) Sets tag 'Severity Group Monthly' to a specific time and date when an update will be done automatically.
   ```
   DOC
 }
@@ -170,6 +171,10 @@ variable "data_disks" {
       (o.on_demand_bursting_enabled == false)
     )])
     error_message = "If enable on demand bursting, possible storage_account_type values are Premium_LRS and Premium_ZRS."
+  }
+  validation {
+    condition     = alltrue([for k, v in var.data_disks : !strcontains(k, "-")])
+    error_message = "Logical Name can't contain a '-'"
   }
 
   default     = {}

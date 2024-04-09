@@ -19,7 +19,6 @@ module "virtual_machine" {
   admin_credential = {
     admin_password = "H3ll0W0rld!"
   }
-  stage = "tst"
 
   resource_group_name = azurerm_resource_group.this.name
   subnet              = azurerm_subnet.this

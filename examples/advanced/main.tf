@@ -11,8 +11,8 @@ module "virtual_machine" {
   public_ip_config = {
     enabled           = true
     allocation_method = "Static"
+    stage             = "tst"
   }
-  stage = "tst"
   nic_config = {
     private_ip                    = "10.0.0.16"
     enable_accelerated_networking = true

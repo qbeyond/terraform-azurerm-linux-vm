@@ -30,7 +30,7 @@ resource "azurerm_network_interface_security_group_association" "this" {
   network_security_group_id = var.nic_config.nsg.id
 }
 
-check {
+check "no_nsg_on_nic" {
   assert {
     condition     = length(azurerm_network_interface_security_group_association.this) == 0
     error_message = "Direct NSG associations to the NIC should be avoided. Assign to subnet instead."

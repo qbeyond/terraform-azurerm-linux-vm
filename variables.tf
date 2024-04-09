@@ -2,7 +2,7 @@ variable "public_ip_config" {
   type = object({
     enabled           = bool
     allocation_method = optional(string, "Static")
-    stage             = string
+    stage             = optional(string)
   })
   default = {
     enabled = false
@@ -11,6 +11,10 @@ variable "public_ip_config" {
   validation {
     condition     = contains(["Static", "Dynamic"], var.public_ip_config.allocation_method)
     error_message = "Allocation method must be Static or Dynamic"
+  }
+  validation {
+    condition     = var.public_ip_config.enabled == true ? var.public_ip_config.stage != null : true
+    error_message = "If public ip is enabled, stage must be set."
   }
   description = <<-DOC
   ```

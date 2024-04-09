@@ -95,7 +95,7 @@ variable "virtual_machine_config" {
     os_publisher                      = string
     os_disk_caching                   = optional(string, "ReadWrite")
     os_disk_size_gb                   = optional(number)
-    os_disk_storage_type              = optional(string, "StandardSSD_LRS")
+    os_disk_storage_type              = optional(string, "Premium_LRS")
     os_disk_write_accelerator_enabled = optional(bool, false)
     zone                              = optional(number)
     availability_set_id               = optional(string)
@@ -112,7 +112,7 @@ variable "virtual_machine_config" {
   }
   validation {
     condition     = (contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && var.virtual_machine_config.os_disk_write_accelerator_enabled == true && var.virtual_machine_config.os_disk_caching == "None") || (var.virtual_machine_config.os_disk_write_accelerator_enabled == false)
-    error_message = "os_disk_write_accelerator_enabled, can only be activated on Premium disks and caching deactivated."
+    error_message = "os_disk_write_accelerator_enabled can only be activated on Premium disks and caching deactivated."
   }
   validation {
     condition     = var.virtual_machine_config.zone == null || var.virtual_machine_config.zone == 1 || var.virtual_machine_config.zone == 2 || var.virtual_machine_config.zone == 3
@@ -154,7 +154,7 @@ variable "data_disks" {
     disk_size_gb               = number
     caching                    = optional(string, "ReadWrite")
     create_option              = optional(string, "Empty")
-    storage_account_type       = optional(string, "StandardSSD_LRS")
+    storage_account_type       = optional(string, "Premium_LRS")
     write_accelerator_enabled  = optional(bool, false)
     on_demand_bursting_enabled = optional(bool, false)
   }))

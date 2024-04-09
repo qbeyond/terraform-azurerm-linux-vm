@@ -30,6 +30,13 @@ resource "azurerm_network_interface_security_group_association" "this" {
   network_security_group_id = var.nic_config.nsg.id
 }
 
+check {
+  assert {
+    condition     = length(azurerm_network_interface_security_group_association.this) == 0
+    error_message = "Direct NSG associations to the NIC should be avoided. Assign to subnet instead."
+  }
+}
+
 resource "azurerm_linux_virtual_machine" "this" {
   name                            = local.virtual_machine.name
   computer_name                   = var.virtual_machine_config.hostname

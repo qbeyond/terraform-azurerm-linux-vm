@@ -2,6 +2,7 @@ variable "public_ip_config" {
   type = object({
     enabled           = bool
     allocation_method = optional(string, "Static")
+    stage             = string
   })
   default = {
     enabled = false
@@ -14,7 +15,8 @@ variable "public_ip_config" {
   description = <<-DOC
   ```
     enabled: Optionally select true if a public ip should be created. Defaults to false.
-    allocation_method: The allocation method of the public ip that will be created. Defaults to static.      
+    allocation_method: The allocation method of the public ip that will be created. Defaults to static.
+    stage: The stage of this PIP. Ex: prd, dev, tst, ...
   ```
   DOC
 }
@@ -101,6 +103,7 @@ variable "virtual_machine_config" {
     availability_set_id               = optional(string)
     proximity_placement_group_id      = optional(string)
     severity_group                    = string
+    update_allowed                    = optional(bool, true)
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
@@ -111,7 +114,13 @@ variable "virtual_machine_config" {
     error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for os_disk_storage_type."
   }
   validation {
-    condition     = (contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && var.virtual_machine_config.os_disk_write_accelerator_enabled == true && var.virtual_machine_config.os_disk_caching == "None") || (var.virtual_machine_config.os_disk_write_accelerator_enabled == false)
+    condition = (
+        var.virtual_machine_config.os_disk_write_accelerator_enabled == true && 
+        contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && 
+        contains(["None", "ReadOnly"], var.virtual_machine_config.os_disk_caching)
+      ) || (
+        var.virtual_machine_config.os_disk_write_accelerator_enabled == false
+      )
     error_message = "os_disk_write_accelerator_enabled can only be activated on Premium disks and caching deactivated."
   }
   validation {
@@ -137,15 +146,9 @@ variable "virtual_machine_config" {
       be activated on Premium disks and caching deactivated. Defaults to false.
     proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.
     severity_group: (Required) Sets tag 'Severity Group Monthly' to a specific time and date when an update will be done automatically.
+    update_allowed: Sets tag 'Update allowed' to yes or no to specify if this VM should currently receive updates.
   ```
   DOC
-}
-
-variable "update_allowed" {
-  type        = bool
-  default     = true
-  nullable    = false
-  description = "Set the tag `Update allowed`. `True` will set `yes`, `false` to `no`."
 }
 
 variable "data_disks" {
@@ -228,10 +231,4 @@ variable "tags" {
   default     = {}
   nullable    = false
   description = "A map of tags that will be set on every resource this module creates."
-}
-
-variable "stage" {
-  type        = string
-  nullable    = false
-  description = "The stage of this VM like prd, dev, tst, ..."
 }

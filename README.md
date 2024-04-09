@@ -68,7 +68,7 @@ resource "azurerm_subnet" "this" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_admin_credential"></a> [admin\_credential](#input\_admin\_credential) | <pre>admin_password: Password of the local administrator.<br>  public_key: SSH public key file (e.g. file(id_rsa.pub))</pre> | <pre>object({<br>    admin_password = optional(string)<br>    public_key     = optional(string)<br>  })</pre> | n/a | yes |
+| <a name="input_admin_credential"></a> [admin\_credential](#input\_admin\_credential) | <pre>Specify either admin_password or public_key:<br>  admin_password: Password of the local administrator.<br>  public_key: SSH public key file (e.g. file(id_rsa.pub))</pre> | <pre>object({<br>    admin_password = optional(string)<br>    public_key     = optional(string)<br>  })</pre> | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where the resources will be created. | `string` | n/a | yes |
 | <a name="input_stage"></a> [stage](#input\_stage) | The stage of this VM like prd, dev, tst, ... | `string` | n/a | yes |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | The variable takes the subnet as input and takes the id and the address prefix for further configuration. | <pre>object({<br>    id               = string<br>    address_prefixes = list(string)<br>  })</pre> | n/a | yes |

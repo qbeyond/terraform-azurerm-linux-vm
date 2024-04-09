@@ -73,6 +73,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   lifecycle {
     prevent_destroy = true
     ignore_changes = [
+      # Ignore policy assigned managed identities
       identity
     ]
   }

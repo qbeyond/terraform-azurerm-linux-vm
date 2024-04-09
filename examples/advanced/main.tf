@@ -20,21 +20,21 @@ module "virtual_machine" {
     nsg                           = azurerm_network_security_group.this
   }
   virtual_machine_config = {
-    hostname                     = local.hostname
-    location                     = azurerm_resource_group.this.location
-    size                         = "Standard_B2s_v2"
-    zone                         = null # Could be the default value "1", or "2" or "3". Not compatible with availability_set_id enabled.
-    os_sku                       = "22_04-lts-gen2"
-    os_offer                     = "0001-com-ubuntu-server-jammy"
-    os_version                   = "latest"
-    os_publisher                 = "Canonical"
-    os_disk_caching              = "ReadWrite"
-    os_disk_storage_type         = "StandardSSD_LRS"
-    os_disk_size_gb              = 64
-    availability_set_id          = azurerm_availability_set.this.id # Not compatible with zone.
-    os_disk_write_accelerator_enabled    = false
-    proximity_placement_group_id = azurerm_proximity_placement_group.this.id
-    severity_group               = "01-second-monday-0300-XCSUFEDTG-reboot"
+    hostname                          = local.hostname
+    location                          = azurerm_resource_group.this.location
+    size                              = "Standard_B2s_v2"
+    zone                              = null # Could be the default value "1", or "2" or "3". Not compatible with availability_set_id enabled.
+    os_sku                            = "22_04-lts-gen2"
+    os_offer                          = "0001-com-ubuntu-server-jammy"
+    os_version                        = "latest"
+    os_publisher                      = "Canonical"
+    os_disk_caching                   = "ReadWrite"
+    os_disk_storage_type              = "StandardSSD_LRS"
+    os_disk_size_gb                   = 64
+    availability_set_id               = azurerm_availability_set.this.id # Not compatible with zone.
+    os_disk_write_accelerator_enabled = false
+    proximity_placement_group_id      = azurerm_proximity_placement_group.this.id
+    severity_group                    = "01-second-monday-0300-XCSUFEDTG-reboot"
     tags = {
       "Environment" = "prd"
     }

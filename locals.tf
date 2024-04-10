@@ -1,6 +1,6 @@
 locals {
   public_ip = {
-    name = coalesce(var.name_overrides.public_ip, "pip-${var.public_ip_config.stage}-${var.virtual_machine_config.hostname}-01-${var.virtual_machine_config.location}")
+    name = var.public_ip_config != null ? coalesce(var.name_overrides.public_ip, "pip-${var.public_ip_config.stage}-${var.virtual_machine_config.hostname}-01-${var.virtual_machine_config.location}") : ""
   }
 
   nic = {

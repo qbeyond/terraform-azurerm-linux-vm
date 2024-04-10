@@ -8,24 +8,56 @@ module "virtual_machine" {
   virtual_machine_config = {
     hostname       = "CUSTAPP001"
     location       = azurerm_resource_group.this.location
-    size           = "Standard_B1ms"
+    size           = "Standard_M8ms"
     os_sku         = "22_04-lts-gen2"
     os_offer       = "0001-com-ubuntu-server-jammy"
     os_version     = "latest"
     os_publisher   = "Canonical"
     severity_group = "01-second-monday-0300-XCSUFEDTG-reboot"
   }
-  admin_username = "local_admin"
   admin_credential = {
     admin_password = "H3ll0W0rld!"
   }
+  stage = "tst"
 
+  data_disks = {
+    shared01 = {
+      lun                        = 1
+      tier                       = "P4"
+      caching                    = "ReadOnly"
+      disk_size_gb               = 513
+      create_option              = "Empty"
+      storage_account_type       = "Premium_LRS"
+      write_accelerator_enabled  = true
+      on_demand_bursting_enabled = true
+    }
+    shared02 = {
+      lun                        = 2
+      tier                       = "P4"
+      caching                    = "None"
+      disk_size_gb               = 513
+      create_option              = "Empty"
+      storage_account_type       = "Premium_LRS"
+      write_accelerator_enabled  = true
+      on_demand_bursting_enabled = true
+    }
+    shared03 = {
+      lun                        = 3
+      tier                       = "P4"
+      caching                    = "ReadWrite"
+      disk_size_gb               = 513
+      create_option              = "Empty"
+      storage_account_type       = "Premium_LRS"
+      write_accelerator_enabled  = false
+      on_demand_bursting_enabled = false
+    }
+  }
   resource_group_name = azurerm_resource_group.this.name
   subnet              = azurerm_subnet.this
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = "rg-TestLinuxBasic-tst-01"
+  name     = "rg-TestLinuxWriteAccelerator-tst-01"
   location = "westeurope"
 }
 

@@ -11,7 +11,7 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 ### Added
  - Output the network interface
 
-## [1.0.0] - 2024-01-11
+## [1.0.0] - 2024-01-11 
 
 ### Added
  - Initial code that creates a VM

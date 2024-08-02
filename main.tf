@@ -81,7 +81,7 @@ resource "azurerm_linux_virtual_machine" "this" {
     prevent_destroy = true
     ignore_changes = [
       # Ignore policy assigned managed identities
-      identity
+      identity,
       admin_password
     ]
   }

@@ -6,6 +6,7 @@ resource "azurerm_managed_disk" "data_disk" {
   zone                       = var.virtual_machine_config.zone
   storage_account_type       = each.value["storage_account_type"]
   create_option              = each.value["create_option"]
+  source_resource_id         = each.value["source_resource_id"]
   disk_size_gb               = each.value["disk_size_gb"]
   on_demand_bursting_enabled = each.value["on_demand_bursting_enabled"]
   tags                       = var.tags

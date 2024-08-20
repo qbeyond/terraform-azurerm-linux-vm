@@ -183,6 +183,12 @@ variable "data_disks" {
     condition     = alltrue([for k, v in var.data_disks : !strcontains(k, "-")])
     error_message = "Logical Name can't contain a '-'"
   }
+  validation {
+    condition     = alltrue([for o in var.data_disks : (
+      (o.source_resource_id != null && contains(["Copy", "Restore"], o.create_option) || (o.create_option == "Empty" && o.source_resource_id == null))
+    )])
+    error_message = "Indicate The source_resource_id of an existing Managed Disk or Snapshot to copy when create_option is Copy or the recovery point to restore when create_option is Restore. When create_option is Empty, leave source_resource_id as null."
+  }
 
   default     = {}
   nullable    = false

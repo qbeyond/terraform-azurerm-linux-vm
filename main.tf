@@ -8,12 +8,12 @@ resource "azurerm_public_ip" "this" {
 }
 
 resource "azurerm_network_interface" "this" {
-  name                          = local.nic.name
-  location                      = var.virtual_machine_config.location
-  resource_group_name           = var.resource_group_name
-  dns_servers                   = var.nic_config.dns_servers
-  enable_accelerated_networking = var.nic_config.enable_accelerated_networking
-  tags                          = var.tags
+  name                           = local.nic.name
+  location                       = var.virtual_machine_config.location
+  resource_group_name            = var.resource_group_name
+  dns_servers                    = var.nic_config.dns_servers
+  accelerated_networking_enabled = var.nic_config.enable_accelerated_networking
+  tags                           = var.tags
 
   ip_configuration {
     name                          = local.nic.ip_config_name

@@ -26,7 +26,7 @@ module "virtual_machine" {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = "rg-TestLinuxBasic-tst-01"
+  name     = "rg-TestLinuxMarketplace-tst-01"
   location = "westeurope"
 }
 

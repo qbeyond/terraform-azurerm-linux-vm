@@ -42,7 +42,7 @@ resource "azurerm_marketplace_agreement" "default" {
 
   publisher = var.virtual_machine_config.os_publisher
   offer     = var.virtual_machine_config.os_offer
-  plan      = var.source_image_reference.os_sku
+  plan      = var.virtual_machine_config.os_sku
 }
 
 resource "azurerm_linux_virtual_machine" "this" {

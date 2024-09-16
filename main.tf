@@ -37,6 +37,14 @@ check "no_nsg_on_nic" {
   }
 }
 
+resource "azurerm_marketplace_agreement" "default" {
+  count = var.virtual_machine_config.enable_plan == true ? 1 : 0
+
+  publisher = var.virtual_machine_config.os_publisher
+  offer     = var.virtual_machine_config.os_offer
+  plan      = var.virtual_machine_config.os_sku
+}
+
 resource "azurerm_linux_virtual_machine" "this" {
   name                            = local.virtual_machine.name
   computer_name                   = var.virtual_machine_config.hostname
@@ -69,6 +77,16 @@ resource "azurerm_linux_virtual_machine" "this" {
     offer     = var.virtual_machine_config.os_offer
     sku       = var.virtual_machine_config.os_sku
     version   = var.virtual_machine_config.os_version
+  }
+
+  dynamic "plan" {
+    for_each = var.virtual_machine_config.enable_plan ? ["one"] : []
+
+    content {
+      name      = var.virtual_machine_config.os_sku
+      product   = var.virtual_machine_config.os_offer
+      publisher = var.virtual_machine_config.os_publisher
+    }
   }
 
   proximity_placement_group_id = var.virtual_machine_config.proximity_placement_group_id

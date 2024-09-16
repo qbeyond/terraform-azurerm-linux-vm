@@ -99,6 +99,7 @@ variable "virtual_machine_config" {
     proximity_placement_group_id      = optional(string)
     severity_group                    = string
     update_allowed                    = optional(bool, true)
+    enable_plan                       = optional(bool, false)
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
@@ -142,6 +143,7 @@ variable "virtual_machine_config" {
     proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.
     severity_group: (Required) Sets tag 'Severity Group Monthly' to a specific time and date when an update will be done automatically.
     update_allowed: Sets tag 'Update allowed' to yes or no to specify if this VM should currently receive updates.
+    enable_plan: When using marketplace images, sending plan information might be required. Also accepts the terms of the marketplace product.
   ```
   DOC
 }

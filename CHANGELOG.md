@@ -6,6 +6,9 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
  
 ## [Unreleased]
 
+## [1.4.0] - 2024-09-16
+  - Added enable_plan option for marketplace images.
+
 ## [1.3.0] - 2024-08-20
 
 ### Added

@@ -90,7 +90,6 @@ variable "virtual_machine_config" {
     os_offer                          = string
     os_version                        = string
     os_publisher                      = string
-    os_plan                           = optional(string)
     os_disk_caching                   = optional(string, "ReadWrite")
     os_disk_size_gb                   = optional(number)
     os_disk_storage_type              = optional(string, "Premium_LRS")
@@ -100,6 +99,7 @@ variable "virtual_machine_config" {
     proximity_placement_group_id      = optional(string)
     severity_group                    = string
     update_allowed                    = optional(bool, true)
+    enable_plan                       = optional(bool, false)
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
@@ -133,7 +133,6 @@ variable "virtual_machine_config" {
     os_offer: (Required) Specifies the offer of the image used to create the virtual machines. Changing this forces a new resource to be created.
     os_version: (Required) Optionally specify an os version for the chosen sku.
     os_publisher: (Required) Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from. Changing this forces a new resource to be created.
-    os_plan: When using marketplace images passing this plan information is required. Otherwise optional.
     os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.
     os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.
     os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.
@@ -144,6 +143,7 @@ variable "virtual_machine_config" {
     proximity_placement_group_id: (Optional) The ID of the Proximity Placement Group which the Virtual Machine should be assigned to.
     severity_group: (Required) Sets tag 'Severity Group Monthly' to a specific time and date when an update will be done automatically.
     update_allowed: Sets tag 'Update allowed' to yes or no to specify if this VM should currently receive updates.
+    enable_plan: When using marketplace images, sending plan information might be required. Also accepts the terms of the marketplace product.
   ```
   DOC
 }

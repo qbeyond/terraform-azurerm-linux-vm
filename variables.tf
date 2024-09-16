@@ -90,6 +90,7 @@ variable "virtual_machine_config" {
     os_offer                          = string
     os_version                        = string
     os_publisher                      = string
+    os_plan                           = optional(string)
     os_disk_caching                   = optional(string, "ReadWrite")
     os_disk_size_gb                   = optional(number)
     os_disk_storage_type              = optional(string, "Premium_LRS")
@@ -132,6 +133,7 @@ variable "virtual_machine_config" {
     os_offer: (Required) Specifies the offer of the image used to create the virtual machines. Changing this forces a new resource to be created.
     os_version: (Required) Optionally specify an os version for the chosen sku.
     os_publisher: (Required) Specifies the Publisher of the Marketplace Image this Virtual Machine should be created from. Changing this forces a new resource to be created.
+    os_plan: When using marketplace images passing this plan information is required. Otherwise optional.
     os_disk_caching: Optionally change the caching option of the os disk. Defaults to ReadWrite.
     os_disk_size_gb: Optionally change the size of the os disk. Defaults to be specified by image.
     os_disk_storage_type: Optionally change the os_disk_storage_type. Defaults to StandardSSD_LRS.

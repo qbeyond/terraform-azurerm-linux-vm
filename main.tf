@@ -83,9 +83,9 @@ resource "azurerm_linux_virtual_machine" "this" {
     for_each = var.virtual_machine_config.enable_plan ? ["one"] : []
 
     content {
-      name      = var.virtual_machine_config.sku
-      product   = var.virtual_machine_config.offer
-      publisher = var.virtual_machine_config.publisher
+      name      = var.virtual_machine_config.os_sku
+      product   = var.virtual_machine_config.os_offer
+      publisher = var.virtual_machine_config.os_publisher
     }
   }
 

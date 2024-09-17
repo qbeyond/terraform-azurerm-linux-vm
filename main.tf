@@ -55,7 +55,6 @@ resource "azurerm_linux_virtual_machine" "this" {
   admin_password                  = var.admin_credential.admin_password
   disable_password_authentication = var.admin_credential.admin_password == null
 
-
   dynamic "admin_ssh_key" {
     for_each = var.admin_credential.public_key != null ? [1] : []
     content {
@@ -103,4 +102,8 @@ resource "azurerm_linux_virtual_machine" "this" {
       admin_password
     ]
   }
+
+  depends_on = [
+    azurerm_marketplace_agreement.default
+  ]
 }

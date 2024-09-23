@@ -6,6 +6,9 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
  
 ## [Unreleased]
 
+## [1.4.1] - 2024-09-17
+  - VMs now depend on marketplace image agreement created by enable_plan=true
+
 ## [1.4.0] - 2024-09-16
   - Added enable_plan option for marketplace images.
 

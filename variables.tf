@@ -106,8 +106,8 @@ variable "virtual_machine_config" {
     error_message = "Possible values are None, ReadOnly and ReadWrite for os_disk_caching."
   }
   validation {
-    condition     = contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS", "PremiumV2_LRS"], var.virtual_machine_config.os_disk_storage_type)
-    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS, Premium_ZRS and PremiumV2_LRS for os_disk_storage_type."
+    condition     = contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type)
+    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for os_disk_storage_type."
   }
   validation {
     condition = (
@@ -158,14 +158,20 @@ variable "data_disks" {
     storage_account_type       = optional(string, "Premium_LRS")
     write_accelerator_enabled  = optional(bool, false)
     on_demand_bursting_enabled = optional(bool, false)
+    disk_iops_read_write       = optional(string, null)
+    disk_mbps_read_write       = optional(string, null)
   }))
   validation {
     condition     = length([for v in var.data_disks : v.lun]) == length(distinct([for v in var.data_disks : v.lun]))
     error_message = "One or more of the lun parameters in the map are duplicates."
   }
   validation {
-    condition     = alltrue([for o in var.data_disks : contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], o.storage_account_type)])
-    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for storage_account_type"
+    condition     = alltrue([for o in var.data_disks : contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS", "PremiumV2_LRS", "UltraSSD_LRS"], o.storage_account_type)])
+    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS, Premium_ZRS, PremiumV2_LRS and UltraSSD_LRS for storage_account_type"
+  }
+  validation {
+    condition     = alltrue([for o in var.data_disks : (contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], o.storage_account_type) && (o.disk_iops_read_write != null || o.disk_mbps_read_write != null))])
+    error_message = "disk_iops_read_write and disk_mbps_read_write are not supported for Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS storage_account_type"
   }
   validation {
     condition = alltrue([for o in var.data_disks : (

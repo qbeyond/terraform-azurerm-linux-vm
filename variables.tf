@@ -94,7 +94,7 @@ variable "virtual_machine_config" {
     os_disk_size_gb                   = optional(number)
     os_disk_storage_type              = optional(string, "Premium_LRS")
     os_disk_write_accelerator_enabled = optional(bool, false)
-    zone                              = optional(number)
+    zone                              = optional(string)
     availability_set_id               = optional(string)
     proximity_placement_group_id      = optional(string)
     severity_group                    = string
@@ -120,7 +120,7 @@ variable "virtual_machine_config" {
     error_message = "os_disk_write_accelerator_enabled can only be activated on Premium disks and caching deactivated."
   }
   validation {
-    condition     = var.virtual_machine_config.zone == null || var.virtual_machine_config.zone == 1 || var.virtual_machine_config.zone == 2 || var.virtual_machine_config.zone == 3
+    condition     = var.virtual_machine_config.zone == null || var.virtual_machine_config.zone == "1" || var.virtual_machine_config.zone == "2" || var.virtual_machine_config.zone == "3"
     error_message = "Zone, can only be empty, 1, 2 or 3."
   }
   nullable    = false

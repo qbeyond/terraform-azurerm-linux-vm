@@ -106,17 +106,17 @@ variable "virtual_machine_config" {
     error_message = "Possible values are None, ReadOnly and ReadWrite for os_disk_caching."
   }
   validation {
-    condition     = contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type)
-    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for os_disk_storage_type."
+    condition     = contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS", "PremiumV2_LRS"], var.virtual_machine_config.os_disk_storage_type)
+    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS, Premium_ZRS and PremiumV2_LRS for os_disk_storage_type."
   }
   validation {
     condition = (
-        var.virtual_machine_config.os_disk_write_accelerator_enabled == true && 
-        contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && 
-        contains(["None", "ReadOnly"], var.virtual_machine_config.os_disk_caching)
+      var.virtual_machine_config.os_disk_write_accelerator_enabled == true &&
+      contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) &&
+      contains(["None", "ReadOnly"], var.virtual_machine_config.os_disk_caching)
       ) || (
-        var.virtual_machine_config.os_disk_write_accelerator_enabled == false
-      )
+      var.virtual_machine_config.os_disk_write_accelerator_enabled == false
+    )
     error_message = "os_disk_write_accelerator_enabled can only be activated on Premium disks and caching deactivated."
   }
   validation {
@@ -186,7 +186,7 @@ variable "data_disks" {
     error_message = "Logical Name can't contain a '-'"
   }
   validation {
-    condition     = alltrue([for o in var.data_disks : (
+    condition = alltrue([for o in var.data_disks : (
       (o.source_resource_id != null && contains(["Copy", "Restore"], o.create_option) || (o.create_option == "Empty" && o.source_resource_id == null))
     )])
     error_message = "When a data disk source resource ID is specified then create option must be either 'Copy' or 'Restore'."

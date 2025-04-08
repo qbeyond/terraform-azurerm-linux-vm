@@ -9,8 +9,10 @@ resource "azurerm_managed_disk" "data_disk" {
   source_resource_id         = each.value["source_resource_id"]
   disk_size_gb               = each.value["disk_size_gb"]
   on_demand_bursting_enabled = each.value["on_demand_bursting_enabled"]
+  disk_iops_read_write       = (each.value["storage_account_type"] == "PremiumV2_LRS" || each.value["storage_account_type"] == "UltraSSD_LRS") ? each.value["disk_iops_read_write"] : null
+  disk_mbps_read_write       = (each.value["storage_account_type"] == "PremiumV2_LRS" || each.value["storage_account_type"] == "UltraSSD_LRS") ? each.value["disk_mbps_read_write"] : null
   tags                       = var.tags
-  
+
   lifecycle {
     prevent_destroy = true
   }

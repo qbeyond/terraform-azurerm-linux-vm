@@ -94,7 +94,7 @@ variable "virtual_machine_config" {
     os_disk_size_gb                   = optional(number)
     os_disk_storage_type              = optional(string, "Premium_LRS")
     os_disk_write_accelerator_enabled = optional(bool, false)
-    zone                              = optional(number)
+    zone                              = optional(string)
     availability_set_id               = optional(string)
     proximity_placement_group_id      = optional(string)
     severity_group                    = string
@@ -111,16 +111,16 @@ variable "virtual_machine_config" {
   }
   validation {
     condition = (
-        var.virtual_machine_config.os_disk_write_accelerator_enabled == true && 
-        contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) && 
-        contains(["None", "ReadOnly"], var.virtual_machine_config.os_disk_caching)
+      var.virtual_machine_config.os_disk_write_accelerator_enabled == true &&
+      contains(["Premium_LRS", "Premium_ZRS"], var.virtual_machine_config.os_disk_storage_type) &&
+      contains(["None", "ReadOnly"], var.virtual_machine_config.os_disk_caching)
       ) || (
-        var.virtual_machine_config.os_disk_write_accelerator_enabled == false
-      )
+      var.virtual_machine_config.os_disk_write_accelerator_enabled == false
+    )
     error_message = "os_disk_write_accelerator_enabled can only be activated on Premium disks and caching deactivated."
   }
   validation {
-    condition     = var.virtual_machine_config.zone == null || var.virtual_machine_config.zone == 1 || var.virtual_machine_config.zone == 2 || var.virtual_machine_config.zone == 3
+    condition     = var.virtual_machine_config.zone == null || var.virtual_machine_config.zone == "1" || var.virtual_machine_config.zone == "2" || var.virtual_machine_config.zone == "3"
     error_message = "Zone, can only be empty, 1, 2 or 3."
   }
   nullable    = false
@@ -158,14 +158,26 @@ variable "data_disks" {
     storage_account_type       = optional(string, "Premium_LRS")
     write_accelerator_enabled  = optional(bool, false)
     on_demand_bursting_enabled = optional(bool, false)
+    disk_iops_read_write       = optional(string, null)
+    disk_mbps_read_write       = optional(string, null)
   }))
   validation {
     condition     = length([for v in var.data_disks : v.lun]) == length(distinct([for v in var.data_disks : v.lun]))
     error_message = "One or more of the lun parameters in the map are duplicates."
   }
   validation {
-    condition     = alltrue([for o in var.data_disks : contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], o.storage_account_type)])
-    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS for storage_account_type"
+    condition     = alltrue([for o in var.data_disks : contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS", "PremiumV2_LRS", "UltraSSD_LRS"], o.storage_account_type)])
+    error_message = "Possible values are Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS, Premium_ZRS, PremiumV2_LRS and UltraSSD_LRS for storage_account_type"
+  }
+  validation {
+    condition = alltrue([for o in var.data_disks : (contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], o.storage_account_type) && (o.disk_iops_read_write != null || o.disk_mbps_read_write != null)
+    || (contains(["PremiumV2_LRS", "UltraSSD_LRS"], o.storage_account_type)))])
+    error_message = "disk_iops_read_write and disk_mbps_read_write are not supported for Standard_LRS, StandardSSD_LRS, Premium_LRS, StandardSSD_ZRS and Premium_ZRS storage_account_type"
+  }
+  validation {
+    condition = alltrue([for o in var.data_disks : ((contains(["PremiumV2_LRS", "UltraSSD_LRS"], o.storage_account_type) && (var.virtual_machine_config.zone != null))
+    || (contains(["Standard_LRS", "StandardSSD_LRS", "Premium_LRS", "StandardSSD_ZRS", "Premium_ZRS"], o.storage_account_type)))])
+    error_message = "Premium SSD v2 & Ultra SSD disks can only be attached to zonal VMs."
   }
   validation {
     condition = alltrue([for o in var.data_disks : (
@@ -186,7 +198,7 @@ variable "data_disks" {
     error_message = "Logical Name can't contain a '-'"
   }
   validation {
-    condition     = alltrue([for o in var.data_disks : (
+    condition = alltrue([for o in var.data_disks : (
       (o.source_resource_id != null && contains(["Copy", "Restore"], o.create_option) || (o.create_option == "Empty" && o.source_resource_id == null))
     )])
     error_message = "When a data disk source resource ID is specified then create option must be either 'Copy' or 'Restore'."

@@ -54,10 +54,10 @@ resource "azurerm_linux_virtual_machine" "this" {
   admin_username                                         = var.admin_username
   admin_password                                         = var.admin_credential.admin_password
   disable_password_authentication                        = var.admin_credential.admin_password == null
-  patch_mode                                             = var.update_settings.patchmode
-  bypass_platform_safety_checks_on_user_schedule_enabled = var.update_settings.patchmode == "ImageDefault" ? false : var.update_settings.bypass_platform_safety_checks_on_user_schedule_enabled
+  patch_mode                                             = var.update_settings.patch_mode
+  bypass_platform_safety_checks_on_user_schedule_enabled = var.update_settings.patch_mode == "ImageDefault" ? false : var.update_settings.bypass_platform_safety_checks_on_user_schedule_enabled
   patch_assessment_mode                                  = var.update_settings.patch_assessment_mode
-  reboot_setting                                         = var.update_settings.patchmode == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
+  reboot_setting                                         = var.update_settings.patch_mode == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
 
 
   dynamic "admin_ssh_key" {

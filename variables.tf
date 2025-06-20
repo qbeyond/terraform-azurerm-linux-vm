@@ -81,6 +81,25 @@ variable "admin_credential" {
   DOC
 }
 
+variable "update_settings" {
+  type = object({
+    bypass_platform_safety_checks_on_user_schedule_enabled = optional(bool, true)                    # will be set to false in den vm code when patch_mode is set to ImageDefault
+    patch_mode                                             = string                                  # can also be AutomaticByPlatform
+    patch_assessment_mode                                  = optional(string, "AutomaticByPlatform") # provision_vm_agent is set to true in code by default
+    reboot_setting                                         = optional(string, "Never")               # reboot setting is declared in the maintenance configuration
+  })
+  default = {
+    patch_mode = "ImageDefault"
+  }
+  description = <<-DOC
+  ```
+    Provides options on update management:
+    For automated update management by Azure you'd want to set patch_mode to AutomaticByPlatform and keep the defaults.
+  ```
+  DOC
+}
+
+
 variable "virtual_machine_config" {
   type = object({
     hostname                          = string

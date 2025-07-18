@@ -3,8 +3,13 @@ locals {
     name = var.public_ip_config != null ? coalesce(var.name_overrides.public_ip, "pip-${var.public_ip_config.stage}-${var.virtual_machine_config.hostname}-01-${var.virtual_machine_config.location}") : ""
   }
 
+  subnet_prefix = (var.subnet.address_prefixes == null
+    ? regex(".*subnets/snet-([0-9-]+)-.*$", var.subnet.id)[0]    # Parse from subnet id if not provided
+    : replace(var.subnet.address_prefixes[0], "/[./]/", "-")     # Replace '.' and '/' with '-' from prefix
+  )
+
   nic = {
-    name           = coalesce(var.name_overrides.nic, "nic-${var.virtual_machine_config.hostname}-${replace(var.subnet.address_prefixes[0], "/[./]/", "-")}")
+    name           = coalesce(var.name_overrides.nic, "nic-${var.virtual_machine_config.hostname}-${local.subnet_prefix}")
     ip_config_name = coalesce(var.name_overrides.nic_ip_config, "internal")
   }
 

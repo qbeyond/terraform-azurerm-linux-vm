@@ -6,6 +6,15 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
  
 ## [Unreleased]
 
+## [1.6.1] - 2025-07-18
+
+### Added
+  - Zones support in Public IP
+  - New validations
+
+### Changed
+  - Subnet address prefix input
+
 ## [1.5.0] - 2025-04-01
   - Introducing support for Premium SSD v2 and Ultra SSD disks
 

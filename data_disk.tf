@@ -3,16 +3,19 @@ resource "azurerm_managed_disk" "data_disk" {
   name                       = lookup(var.name_overrides.data_disks, each.key, "disk-${var.virtual_machine_config.hostname}-${each.key}")
   location                   = var.virtual_machine_config.location
   resource_group_name        = var.resource_group_name
-  zone                       = var.virtual_machine_config.zone
   storage_account_type       = each.value["storage_account_type"]
   create_option              = each.value["create_option"]
   source_resource_id         = each.value["source_resource_id"]
   disk_size_gb               = each.value["disk_size_gb"]
   on_demand_bursting_enabled = each.value["on_demand_bursting_enabled"]
-  disk_iops_read_write       = (each.value["storage_account_type"] == "PremiumV2_LRS" || each.value["storage_account_type"] == "UltraSSD_LRS") ? each.value["disk_iops_read_write"] : null
-  disk_mbps_read_write       = (each.value["storage_account_type"] == "PremiumV2_LRS" || each.value["storage_account_type"] == "UltraSSD_LRS") ? each.value["disk_mbps_read_write"] : null
-  tags                       = var.tags
+  zone                       = var.virtual_machine_config.zone
+  disk_iops_read_write       = each.value["disk_iops_read_write"]
+  disk_mbps_read_write       = each.value["disk_mbps_read_write"]
+  disk_iops_read_only        = each.value["disk_iops_read_only"]
+  disk_mbps_read_only        = each.value["disk_mbps_read_only"]
+  max_shares                 = each.value["max_shares"] 
 
+  tags                 = var.tags
   lifecycle {
     prevent_destroy = true
   }

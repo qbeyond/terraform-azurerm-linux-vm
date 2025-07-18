@@ -4,6 +4,9 @@ resource "azurerm_public_ip" "this" {
   resource_group_name = var.resource_group_name
   location            = var.virtual_machine_config.location
   allocation_method   = var.public_ip_config.allocation_method
+  zones               = [var.virtual_machine_config.zone]
+  sku                 = var.public_ip_config.sku
+
   tags                = var.tags
 }
 

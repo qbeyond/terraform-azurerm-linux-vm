@@ -7,7 +7,7 @@ resource "azurerm_public_ip" "this" {
   zones               = [var.virtual_machine_config.zone]
   sku                 = var.public_ip_config.sku
 
-  tags                = var.tags
+  tags = var.tags
 }
 
 resource "azurerm_network_interface" "this" {
@@ -18,12 +18,16 @@ resource "azurerm_network_interface" "this" {
   accelerated_networking_enabled = var.nic_config.enable_accelerated_networking
   tags                           = var.tags
 
-  ip_configuration {
-    name                          = local.nic.ip_config_name
-    subnet_id                     = var.subnet.id
-    private_ip_address_allocation = var.nic_config.private_ip == null ? "Dynamic" : "Static"
-    private_ip_address            = var.nic_config.private_ip
-    public_ip_address_id          = var.public_ip_config != null ? azurerm_public_ip.this[0].id : null
+  dynamic "ip_configuration" {
+    for_each = var.nic_config.private_ip
+    content {
+      name                          = "${local.nic.ip_config_name}-${replace(ip_configuration.value, "/[./]/", "-")}"
+      subnet_id                     = var.subnet.id
+      private_ip_address_allocation = ip_configuration.value == null ? "Dynamic" : "Static"
+      private_ip_address            = ip_configuration.value
+      #TODO: if index == 0 then set rimary == true
+      public_ip_address_id = var.public_ip_config != null ? azurerm_public_ip.this[0].id : null #TODO: This could be an issue if multiple private IPs are assigned. The Terraform would try to assigne the same public IP multiple times
+    }
   }
 }
 

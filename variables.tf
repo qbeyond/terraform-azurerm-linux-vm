@@ -25,10 +25,21 @@ variable "public_ip_config" {
   DOC
 }
 
+variable "additional_ip_configurations" {
+  type = map(object({
+    private_ip           = optional(string)
+    public_ip_address_id = optional(string)
+  }))
+  default     = {}
+  nullable    = false
+  description = "List of additional ip configurations for a nic."
+
+}
+
 # nsg needs to be an object to use the count object in main.tf. 
 variable "nic_config" {
   type = map(object({
-    private_ip                    = optional(list(string))
+    private_ip                    = optional(string)
     dns_servers                   = optional(list(string))
     enable_accelerated_networking = optional(bool, false)
     nsg = optional(object({
@@ -39,7 +50,6 @@ variable "nic_config" {
   nullable    = false
   description = <<-DOC
   ```
-    A NIC can have multiple ip configurations, e.g. to assign like an additional IP address.
     private_ip: Optionally specify a private ip to use. Otherwise it will be allocated dynamically.
     dns_servers: Optionally specify a list of dns servers for the nic.
     enable_accelerated_networking: Enabled Accelerated networking (SR-IOV) on the NIC. The machine SKU must support this feature.

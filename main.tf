@@ -18,15 +18,26 @@ resource "azurerm_network_interface" "this" {
   accelerated_networking_enabled = var.nic_config.enable_accelerated_networking
   tags                           = var.tags
 
+  # first IP configuration
+  ip_configuration {
+    name                          = local.nic.ip_config_name
+    subnet_id                     = var.subnet.id
+    private_ip_address_allocation = var.nic_config.private_ip == null ? "Dynamic" : "Static"
+    private_ip_address            = var.nic_config.private_ip
+    primary                       = true
+    public_ip_address_id          = var.public_ip_config != null ? azurerm_public_ip.this[0].id : null
+  }
+
+  # additional IP configurations
   dynamic "ip_configuration" {
-    for_each = var.nic_config.private_ip
+    for_each = var.additional_ip_configurations
     content {
-      name                          = "${local.nic.ip_config_name}-${replace(ip_configuration.value, "/[./]/", "-")}"
+      name                          = ip_configuration.key
       subnet_id                     = var.subnet.id
-      private_ip_address_allocation = ip_configuration.value == null ? "Dynamic" : "Static"
-      private_ip_address            = ip_configuration.value
-      #TODO: if index == 0 then set rimary == true
-      public_ip_address_id = var.public_ip_config != null ? azurerm_public_ip.this[0].id : null #TODO: This could be an issue if multiple private IPs are assigned. The Terraform would try to assigne the same public IP multiple times
+      private_ip_address_allocation = ip_configuration.value["private_ip"] == null ? "Dynamic" : "Static"
+      private_ip_address            = ip_configuration.value["private_ip"]
+      primary                       = false
+      public_ip_address_id          = ip_configuration.value["public_ip_address_id"] != null ? ip_configuration.value["public_ip_address_id"] : null #TODO: This could be an issue if multiple private IPs are assigned. The Terraform would try to assigne the same public IP multiple times
     }
   }
 }

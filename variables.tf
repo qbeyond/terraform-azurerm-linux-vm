@@ -38,14 +38,14 @@ variable "additional_ip_configurations" {
 
 # nsg needs to be an object to use the count object in main.tf. 
 variable "nic_config" {
-  type = map(object({
+  type = object({
     private_ip                    = optional(string)
     dns_servers                   = optional(list(string))
     enable_accelerated_networking = optional(bool, false)
     nsg = optional(object({
       id = string
     }))
-  }))
+  })
   default     = {}
   nullable    = false
   description = <<-DOC

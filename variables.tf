@@ -25,6 +25,17 @@ variable "public_ip_config" {
   DOC
 }
 
+variable "additional_ip_configurations" {
+  type = map(object({
+    private_ip           = optional(string)
+    public_ip_address_id = optional(string)
+  }))
+  default     = {}
+  nullable    = false
+  description = "List of additional ip configurations for a nic."
+
+}
+
 # nsg needs to be an object to use the count object in main.tf. 
 variable "nic_config" {
   type = object({
@@ -67,7 +78,7 @@ variable "subnet" {
   ```
   DOC
   validation {
-    condition = var.subnet.address_prefixes == null ? can(regex(".*subnets/snet-[0-9-]+-.*$", var.subnet.id)) : true
+    condition     = var.subnet.address_prefixes == null ? can(regex(".*subnets/snet-[0-9-]+-.*$", var.subnet.id)) : true
     error_message = "If no address prefix is specified, the name of the subnet must match the naming convention."
   }
 }
@@ -224,7 +235,7 @@ variable "data_disks" {
     error_message = "on_demand_bursting_enabled` can only be set to true when `disk_size_gb` is larger than 512GB."
   }
   validation {
-    condition = alltrue([for o in var.data_disks: (
+    condition = alltrue([for o in var.data_disks : (
       (o.write_accelerator_enabled == true && contains(["Premium_LRS", "Premium_ZRS"], o.storage_account_type) && contains(["None"], o.caching)) ||
       (o.write_accelerator_enabled == false)
     )])
@@ -241,7 +252,7 @@ variable "data_disks" {
     condition = alltrue([
       for v in var.data_disks :
       (
-        (v.storage_account_type != "PremiumV2_LRS") || 
+        (v.storage_account_type != "PremiumV2_LRS") ||
         (var.virtual_machine_config.zone != null)
       )
     ])
@@ -270,7 +281,7 @@ variable "data_disks" {
     error_message = "Logical Name can't contain a '-'"
   }
   validation {
-    condition     = alltrue([for o in var.data_disks : (
+    condition = alltrue([for o in var.data_disks : (
       (o.source_resource_id != null && contains(["Copy", "Restore"], o.create_option) || (o.create_option == "Empty" && o.source_resource_id == null))
     )])
     error_message = "When a data disk source resource ID is specified then create option must be either 'Copy' or 'Restore'."
@@ -283,7 +294,7 @@ variable "data_disks" {
           o.disk_mbps_read_write == null &&
           o.disk_iops_read_only == null &&
           o.disk_mbps_read_only == null
-        ) || (
+          ) || (
           contains(["UltraSSD_LRS", "PremiumV2_LRS"], o.storage_account_type)
         )
       )
@@ -295,7 +306,7 @@ variable "data_disks" {
       for o in var.data_disks : (
         (
           o.disk_iops_read_only == null && o.disk_mbps_read_only == null
-        ) || (
+          ) || (
           contains(["UltraSSD_LRS", "PremiumV2_LRS"], o.storage_account_type) &&
           o.max_shares != null &&
           o.max_shares > 1 &&
@@ -316,7 +327,7 @@ variable "data_disks" {
     condition = alltrue([
       for o in var.data_disks : (
         (o.disk_iops_read_write == null ? true : (o.disk_iops_read_write >= 3000 && o.disk_iops_read_write <= 64000)) &&
-        (o.disk_iops_read_only  == null ? true : (o.disk_iops_read_only  >= 3000 && o.disk_iops_read_only  <= 64000))
+        (o.disk_iops_read_only == null ? true : (o.disk_iops_read_only >= 3000 && o.disk_iops_read_only <= 64000))
       )
     ])
     error_message = "disk_iops_read_write and disk_iops_read_only must be between 3000 and 64000 if set."
@@ -325,7 +336,7 @@ variable "data_disks" {
     condition = alltrue([
       for o in var.data_disks : (
         (o.disk_mbps_read_write == null ? true : (o.disk_mbps_read_write >= 125 && o.disk_mbps_read_write <= 750)) &&
-        (o.disk_mbps_read_only  == null ? true : (o.disk_mbps_read_only  >= 125 && o.disk_mbps_read_only  <= 750))
+        (o.disk_mbps_read_only == null ? true : (o.disk_mbps_read_only >= 125 && o.disk_mbps_read_only <= 750))
       )
     ])
     error_message = "disk_mbps_read_write and disk_mbps_read_only must be between 125 and 750 if set."

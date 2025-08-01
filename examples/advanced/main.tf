@@ -19,6 +19,11 @@ module "virtual_machine" {
     dns_servers                   = ["10.0.0.10", "10.0.0.11"]
     nsg                           = azurerm_network_security_group.this
   }
+  additional_ip_configurations = {
+    cluster_ip = {
+      private_ip = "10.0.0.17"
+    }
+  }
   virtual_machine_config = {
     hostname                          = local.hostname
     location                          = azurerm_resource_group.this.location

@@ -7,7 +7,7 @@ resource "azurerm_public_ip" "this" {
   zones               = [var.virtual_machine_config.zone]
   sku                 = var.public_ip_config.sku
 
-  tags                = var.tags
+  tags = var.tags
 }
 
 resource "azurerm_network_interface" "this" {
@@ -18,12 +18,27 @@ resource "azurerm_network_interface" "this" {
   accelerated_networking_enabled = var.nic_config.enable_accelerated_networking
   tags                           = var.tags
 
+  # first IP configuration
   ip_configuration {
     name                          = local.nic.ip_config_name
     subnet_id                     = var.subnet.id
     private_ip_address_allocation = var.nic_config.private_ip == null ? "Dynamic" : "Static"
     private_ip_address            = var.nic_config.private_ip
+    primary                       = true
     public_ip_address_id          = var.public_ip_config != null ? azurerm_public_ip.this[0].id : null
+  }
+
+  # additional IP configurations
+  dynamic "ip_configuration" {
+    for_each = var.additional_ip_configurations
+    content {
+      name                          = ip_configuration.key
+      subnet_id                     = var.subnet.id
+      private_ip_address_allocation = ip_configuration.value["private_ip"] == null ? "Dynamic" : "Static"
+      private_ip_address            = ip_configuration.value["private_ip"]
+      primary                       = false
+      public_ip_address_id          = ip_configuration.value["public_ip_address_id"] != null ? ip_configuration.value["public_ip_address_id"] : null
+    }
   }
 }
 

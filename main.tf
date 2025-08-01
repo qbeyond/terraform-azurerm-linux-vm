@@ -37,7 +37,7 @@ resource "azurerm_network_interface" "this" {
       private_ip_address_allocation = ip_configuration.value["private_ip"] == null ? "Dynamic" : "Static"
       private_ip_address            = ip_configuration.value["private_ip"]
       primary                       = false
-      public_ip_address_id          = ip_configuration.value["public_ip_address_id"] != null ? ip_configuration.value["public_ip_address_id"] : null #TODO: This could be an issue if multiple private IPs are assigned. The Terraform would try to assigne the same public IP multiple times
+      public_ip_address_id          = ip_configuration.value["public_ip_address_id"] != null ? ip_configuration.value["public_ip_address_id"] : null
     }
   }
 }

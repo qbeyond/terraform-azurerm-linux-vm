@@ -77,7 +77,6 @@ resource "azurerm_linux_virtual_machine" "this" {
   patch_assessment_mode                                  = var.update_settings.patch_assessment_mode
   reboot_setting                                         = var.update_settings.patch_mode == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
 
-
   dynamic "admin_ssh_key" {
     for_each = var.admin_credential.public_key != null ? [1] : []
     content {
@@ -103,7 +102,6 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   dynamic "plan" {
     for_each = var.virtual_machine_config.enable_plan ? ["one"] : []
-
     content {
       name      = var.virtual_machine_config.os_sku
       product   = var.virtual_machine_config.os_offer
@@ -128,5 +126,38 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   depends_on = [
     azurerm_marketplace_agreement.default
+  ]
+}
+
+
+resource "azurerm_virtual_machine_extension" "python_setup" {
+  count                = var.disk_encryption != null ? 1 : 0
+  name                 = "${var.virtual_machine_config.hostname}-pythonSetup"
+  virtual_machine_id   = azurerm_linux_virtual_machine.this.id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.1"
+
+  settings = <<SETTINGS
+{
+  "commandToExecute": "bash -c 'if command -v apt-get >/dev/null 2>&1; then apt-get update -y && apt-get install -y python2 || apt-get install -y python-is-python2; elif command -v yum >/dev/null 2>&1; then yum install -y python2 || yum install -y python; elif command -v dnf >/dev/null 2>&1; then dnf install -y python2 || dnf install -y python; elif command -v zypper >/dev/null 2>&1; then zypper refresh && (zypper install -y python2 || zypper install -y python); fi; if [ -x /usr/bin/python2 ]; then ln -sf /usr/bin/python2 /usr/bin/python; fi'"
+}
+SETTINGS
+}
+
+
+resource "azurerm_virtual_machine_extension" "disk_encryption" {
+  count = var.disk_encryption != null ? 1 : 0
+
+  name                 = "${var.virtual_machine_config.hostname}-diskEncryption"
+  virtual_machine_id   = azurerm_linux_virtual_machine.this.id
+  publisher            = var.disk_encryption.publisher
+  type                 = var.disk_encryption.type
+  type_handler_version = var.disk_encryption.type_handler_version
+
+  settings = jsonencode(var.disk_encryption.settings)
+
+  depends_on = [
+    azurerm_virtual_machine_extension.python_setup
   ]
 }

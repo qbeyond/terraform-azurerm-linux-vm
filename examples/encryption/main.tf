@@ -63,12 +63,13 @@ module "virtual_machine" {
     hostname       = "CUSTLINUX001"
     location       = local.location
     size           = "Standard_D2s_v3"
-    os_offer       = "0001-com-ubuntu-server-jammy"
-    os_sku         = "22_04-lts-gen2"
-    os_version     = "latest"
+    os_offer       = "0001-com-ubuntu-server-focal"
+    os_sku         = "20_04-lts"
     os_publisher   = "Canonical"
+    os_version     = "latest"
     severity_group = "01-first-monday-2000-csu-reboot"
   }
+
 
   admin_username = "local_admin"
   admin_credential = {
@@ -81,7 +82,7 @@ module "virtual_machine" {
   disk_encryption = {
     settings = {
       EncryptionOperation    = "EnableEncryption"
-      KeyEncryptionAlgorithm = "RSA-OAEP-256"
+      KeyEncryptionAlgorithm = "RSA-OAEP"
       KeyVaultURL            = azurerm_key_vault.this.vault_uri
       KeyVaultResourceId     = azurerm_key_vault.this.id
       KekVaultResourceId     = azurerm_key_vault.this.id

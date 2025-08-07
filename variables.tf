@@ -421,9 +421,10 @@ variable "disk_encryption" {
   DOC
 
   type = object({
-    publisher            = optional(string, "Microsoft.Azure.Security")
-    type                 = optional(string, "AzureDiskEncryptionForLinux")
-    type_handler_version = optional(string, "1.1")
+    publisher                  = optional(string, "Microsoft.Azure.Security")
+    type                       = optional(string, "AzureDiskEncryptionForLinux")
+    type_handler_version       = optional(string, "1.1")
+    auto_upgrade_minor_version = optional(bool, true)
     settings = object({
       EncryptionOperation    = optional(string, "EnableEncryption")
       KeyEncryptionAlgorithm = optional(string, "RSA-OAEP")

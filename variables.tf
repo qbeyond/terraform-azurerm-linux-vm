@@ -53,11 +53,11 @@ variable "nic_config" {
   nullable    = false
   description = <<-DOC
   ```
-    private_ip: Optioanlly specify a private ip to use. Otherwise it will  be allocated dynamically.
+    private_ip: Optionally specify a private ip to use. Otherwise it will  be allocated dynamically.
     dns_servers: Optionally specify a list of dns servers for the nic.
     enable_accelerated_networking: Enabled Accelerated networking (SR-IOV) on the NIC. The machine SKU must support this feature.
     nsg: Although it is discouraged you can optionally assign an NSG to the NIC. Optionally specify a NSG object.
-    asg: Optioanlly specify an application security group for the nic.
+    asg: Optionally specify an application security group for the nic.
   ```
   DOC
 }

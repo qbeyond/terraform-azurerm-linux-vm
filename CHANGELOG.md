@@ -6,6 +6,16 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
  
 ## [Unreleased]
 
+## [1.8.0] - 2025-08-07
+
+### Added
+- Optional disk encryption support for Linux VM, allowing users to enable Key Vault–based encryption.
+- Feature for additional nics
+- Tags for the disk encryption
+
+### Fixed
+- Fixed example for pip zones
+
 ## [1.7.0] - 2025-07-18
 
 ### Added

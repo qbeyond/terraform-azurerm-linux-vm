@@ -42,6 +42,9 @@ variable "nic_config" {
     private_ip                    = optional(string)
     dns_servers                   = optional(list(string))
     enable_accelerated_networking = optional(bool, false)
+    asg = optional(object({
+      id = string
+    }))
     nsg = optional(object({
       id = string
     }))
@@ -50,10 +53,11 @@ variable "nic_config" {
   nullable    = false
   description = <<-DOC
   ```
-    private_ip: Optionally specify a private ip to use. Otherwise it will be allocated dynamically.
+    private_ip: Optionally specify a private ip to use. Otherwise it will  be allocated dynamically.
     dns_servers: Optionally specify a list of dns servers for the nic.
     enable_accelerated_networking: Enabled Accelerated networking (SR-IOV) on the NIC. The machine SKU must support this feature.
     nsg: Although it is discouraged you can optionally assign an NSG to the NIC. Optionally specify a NSG object.
+    asg: Optionally specify an application security group for the nic.
   ```
   DOC
 }
@@ -402,4 +406,50 @@ variable "tags" {
   default     = {}
   nullable    = false
   description = "A map of tags that will be set on every resource this module creates."
+}
+
+variable "disk_encryption" {
+  description = <<-DOC
+  Configuration for Azure Disk Encryption extension. When null, no ADE extension is created.
+  publisher: (Optional) The publisher of the Azure Disk Encryption extension. Defaults to "Microsoft.Azure.Security".
+  type: (Optional) The type of the Azure Disk Encryption extension. Defaults to "AzureDiskEncryptionForLinux".
+  type_handler_version: (Optional) The version of the Azure Disk Encryption extension handler. Defaults to "1.1".
+  auto_upgrade_minor_version: (Optional) Indicates whether the extension should be automatically upgraded to the latest minor version when it's available. Defaults to true.
+  settings: Configuration object for disk encryption settings.
+    EncryptionOperation: (Optional) The operation to perform. Defaults to "EnableEncryption".
+    KeyEncryptionAlgorithm: (Optional) The algorithm used for key encryption. Defaults to "RSA-OAEP".
+    KeyVaultURL: The URL of the Key Vault to use for encryption.
+    KeyVaultResourceId: The resource ID of the Key Vault to use for encryption.
+    KeyEncryptionKeyURL: The URL of the Key Encryption Key in the Key Vault.
+    KekVaultResourceId: The resource ID of the Key Encryption Key Vault.
+    VolumeType: (Optional) The type of volume to encrypt. Possible values are "All", "OS", or "Data". Defaults to "All".
+  DOC
+
+  type = object({
+    publisher                  = optional(string, "Microsoft.Azure.Security")
+    type                       = optional(string, "AzureDiskEncryptionForLinux")
+    type_handler_version       = optional(string, "1.1")
+    auto_upgrade_minor_version = optional(bool, true)
+    settings = object({
+      EncryptionOperation    = optional(string, "EnableEncryption")
+      KeyEncryptionAlgorithm = optional(string, "RSA-OAEP")
+      KeyVaultURL            = string
+      KeyVaultResourceId     = string
+      KeyEncryptionKeyURL    = string
+      KekVaultResourceId     = string
+      VolumeType             = optional(string, "All")
+    })
+  })
+
+  validation {
+    condition     = contains(["All", "OS", "Data"], try(var.disk_encryption.settings.VolumeType, "All"))
+    error_message = "VolumeType must be one of 'All', 'OS', or 'Data'."
+  }
+
+  validation {
+    condition     = var.disk_encryption == null || var.disk_encryption.settings.KeyVaultURL != ""
+    error_message = "KeyVaultURL must be specified when disk_encryption is not null."
+  }
+
+  default = null
 }

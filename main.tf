@@ -4,7 +4,7 @@ resource "azurerm_public_ip" "this" {
   resource_group_name = var.resource_group_name
   location            = var.virtual_machine_config.location
   allocation_method   = var.public_ip_config.allocation_method
-  zones               = [var.virtual_machine_config.zone]
+  zones               = var.virtual_machine_config.zone != null ? [var.virtual_machine_config.zone] : null
   sku                 = var.public_ip_config.sku
 
   tags = var.tags
@@ -48,6 +48,12 @@ resource "azurerm_network_interface_security_group_association" "this" {
   network_security_group_id = var.nic_config.nsg.id
 }
 
+resource "azurerm_network_interface_application_security_group_association" "additional_nics" {
+  count                         = var.additional_network_interface_ids != [] && var.nic_config.asg != null ? length(var.additional_network_interface_ids) : 0
+  network_interface_id          = var.additional_network_interface_ids[count.index]
+  application_security_group_id = var.nic_config.asg.id
+}
+
 check "no_nsg_on_nic" {
   assert {
     condition     = length(azurerm_network_interface_security_group_association.this) == 0
@@ -77,7 +83,6 @@ resource "azurerm_linux_virtual_machine" "this" {
   patch_assessment_mode                                  = var.update_settings.patch_assessment_mode
   reboot_setting                                         = var.update_settings.patch_mode == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
 
-
   dynamic "admin_ssh_key" {
     for_each = var.admin_credential.public_key != null ? [1] : []
     content {
@@ -103,7 +108,6 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   dynamic "plan" {
     for_each = var.virtual_machine_config.enable_plan ? ["one"] : []
-
     content {
       name      = var.virtual_machine_config.os_sku
       product   = var.virtual_machine_config.os_offer
@@ -128,5 +132,38 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   depends_on = [
     azurerm_marketplace_agreement.default
+  ]
+}
+
+
+
+resource "azurerm_virtual_machine_extension" "python_setup" {
+  count                = var.disk_encryption != null ? 1 : 0
+  name                 = "${var.virtual_machine_config.hostname}-pythonSetup"
+  virtual_machine_id   = azurerm_linux_virtual_machine.this.id
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.1"
+
+  settings = <<SETTINGS
+{
+  "commandToExecute": "bash -c 'apt-get update -y && apt-get install -y python2 || apt-get install -y python-is-python2; ln -sf /usr/bin/python2 /usr/bin/python'"
+}
+SETTINGS
+}
+
+resource "azurerm_virtual_machine_extension" "disk_encryption" {
+  count                      = var.disk_encryption != null ? 1 : 0
+  name                       = "${var.virtual_machine_config.hostname}-diskEncryption"
+  virtual_machine_id         = azurerm_linux_virtual_machine.this.id
+  publisher                  = var.disk_encryption.publisher
+  type                       = var.disk_encryption.type
+  type_handler_version       = var.disk_encryption.type_handler_version
+  auto_upgrade_minor_version = var.disk_encryption.auto_upgrade_minor_version
+  tags                       = var.tags
+  settings                   = jsonencode(var.disk_encryption.settings)
+
+  depends_on = [
+    azurerm_virtual_machine_extension.python_setup
   ]
 }

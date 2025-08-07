@@ -6,6 +6,7 @@ locals {
   hostname = "CUSTAPP007"
 }
 
+
 module "virtual_machine" {
   source = "../.."
   public_ip_config = {
@@ -18,6 +19,7 @@ module "virtual_machine" {
     enable_accelerated_networking = true
     dns_servers                   = ["10.0.0.10", "10.0.0.11"]
     nsg                           = azurerm_network_security_group.this
+    asg                           = azurerm_application_security_group.this
   }
   additional_ip_configurations = {
     cluster_ip = {
@@ -151,4 +153,10 @@ resource "azurerm_network_security_group" "this" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+}
+
+resource "azurerm_application_security_group" "this" {
+  name                = "asg-example"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
 }

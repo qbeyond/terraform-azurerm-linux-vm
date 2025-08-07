@@ -6,6 +6,7 @@ locals {
   hostname = "CUSTAPP007"
 }
 
+
 module "virtual_machine" {
   source = "../.."
   public_ip_config = {

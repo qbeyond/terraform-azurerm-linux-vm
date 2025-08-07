@@ -410,6 +410,7 @@ variable "disk_encryption" {
   publisher: (Optional) The publisher of the Azure Disk Encryption extension. Defaults to "Microsoft.Azure.Security".
   type: (Optional) The type of the Azure Disk Encryption extension. Defaults to "AzureDiskEncryptionForLinux".
   type_handler_version: (Optional) The version of the Azure Disk Encryption extension handler. Defaults to "1.1".
+  auto_upgrade_minor_version: (Optional) Indicates whether the extension should be automatically upgraded to the latest minor version when it's available. Defaults to true.
   settings: Configuration object for disk encryption settings.
     EncryptionOperation: (Optional) The operation to perform. Defaults to "EnableEncryption".
     KeyEncryptionAlgorithm: (Optional) The algorithm used for key encryption. Defaults to "RSA-OAEP".

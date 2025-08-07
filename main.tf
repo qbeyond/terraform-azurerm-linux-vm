@@ -147,16 +147,15 @@ SETTINGS
 }
 
 resource "azurerm_virtual_machine_extension" "disk_encryption" {
-  count                = var.disk_encryption != null ? 1 : 0
-  name                 = "${var.virtual_machine_config.hostname}-diskEncryption"
-  virtual_machine_id   = azurerm_linux_virtual_machine.this.id
-  publisher            = var.disk_encryption.publisher
-  type                 = var.disk_encryption.type
-  type_handler_version = var.disk_encryption.type_handler_version
-
+  count                      = var.disk_encryption != null ? 1 : 0
+  name                       = "${var.virtual_machine_config.hostname}-diskEncryption"
+  virtual_machine_id         = azurerm_linux_virtual_machine.this.id
+  publisher                  = var.disk_encryption.publisher
+  type                       = var.disk_encryption.type
+  type_handler_version       = var.disk_encryption.type_handler_version
   auto_upgrade_minor_version = var.disk_encryption.auto_upgrade_minor_version
-
-  settings = jsonencode(var.disk_encryption.settings)
+  tags                       = var.tags
+  settings                   = jsonencode(var.disk_encryption.settings)
 
   depends_on = [
     azurerm_virtual_machine_extension.python_setup

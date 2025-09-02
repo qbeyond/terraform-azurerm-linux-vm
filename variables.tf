@@ -12,7 +12,9 @@ variable "public_ip_config" {
 
   validation {
     condition = (
-      var.virtual_machine_config.zone == null || var.public_ip_config.sku == "Standard"
+      var.public_ip_config == null || 
+      var.virtual_machine_config.zone == null || 
+      var.public_ip_config.sku == "Standard"
     )
     error_message = "If a zone is specified, the Public IP SKU must be set to 'Standard'."
   }

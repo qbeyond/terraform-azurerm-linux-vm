@@ -222,6 +222,7 @@ variable "data_disks" {
     disk_iops_read_only        = optional(number)
     disk_mbps_read_only        = optional(number)
     max_shares                 = optional(number)
+    tags                       = optional(map(string), null)
   }))
   validation {
     condition     = length([for v in var.data_disks : v.lun]) == length(distinct([for v in var.data_disks : v.lun]))

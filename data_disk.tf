@@ -15,7 +15,10 @@ resource "azurerm_managed_disk" "data_disk" {
   disk_mbps_read_only        = each.value["disk_mbps_read_only"]
   max_shares                 = each.value["max_shares"] 
 
-  tags                 = var.tags
+  tags = merge(
+    var.tags,
+    coalesce(each.value.tags, {})
+  )
   lifecycle {
     prevent_destroy = true
   }

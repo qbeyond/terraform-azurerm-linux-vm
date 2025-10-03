@@ -6,7 +6,7 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
  
 ## [Unreleased]
 
-## [2.0.2] - 2025-10-03
+## [2.1.0] - 2025-10-03
 
 ### Added
 - Capability to set specific tags to datadisks

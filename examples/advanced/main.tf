@@ -65,6 +65,7 @@ module "virtual_machine" {
       storage_account_type       = "Premium_LRS"
       write_accelerator_enabled  = false
       on_demand_bursting_enabled = true
+      max_shares                 = 2
     }
   }
 

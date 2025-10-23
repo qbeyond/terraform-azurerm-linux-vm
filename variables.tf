@@ -311,17 +311,40 @@ variable "data_disks" {
   validation {
     condition = alltrue([
       for o in var.data_disks : (
+        o.max_shares == null || o.max_shares >= 1 &&
         (
-          o.disk_iops_read_only == null && o.disk_mbps_read_only == null
-          ) || (
-          contains(["UltraSSD_LRS", "PremiumV2_LRS"], o.storage_account_type) &&
-          o.max_shares != null &&
-          o.max_shares > 1 &&
-          o.max_shares <= 10
+          // Ultra SSD: max 5
+          (o.storage_account_type == "UltraSSD_LRS" && o.max_shares <= 5) ||
+
+          // PremiumV2 SSD: max 5
+          (o.storage_account_type == "PremiumV2_LRS" && o.max_shares <= 15) ||
+
+          // Premium SSD: P15/P20 max 2
+          (o.storage_account_type == "Premium_LRS" &&
+            (
+              (o.disk_size_gb >= 128 && o.disk_size_gb < 256 && o.max_shares <= 2) || // P15
+              (o.disk_size_gb >= 256 && o.disk_size_gb < 512 && o.max_shares <= 2) || // P20
+
+              // P30/P40/P50 max 5
+              (o.disk_size_gb >= 512 && o.disk_size_gb < 2048 && o.max_shares <= 5) ||
+
+              // P60/P70/P80 max 10
+              (o.disk_size_gb >= 2048 && o.max_shares <= 10)
+            )
+          ) ||
+
+          // Standard SSD
+          (o.storage_account_type == "StandardSSD_LRS" &&
+            (
+              (o.disk_size_gb >= 32 && o.disk_size_gb < 256 && o.max_shares <= 3) ||   // E1–E20
+              (o.disk_size_gb >= 256 && o.disk_size_gb < 1024 && o.max_shares <= 5) || // E30–E50
+              (o.disk_size_gb >= 1024 && o.max_shares <= 10)                           // E60–E80
+            )
+          )
         )
       )
     ])
-    error_message = "disk_iops_read_only and disk_mbps_read_only can only be set for UltraSSD_LRS or PremiumV2_LRS disks with shared disk enabled (max_shares between 2 and 10)."
+    error_message = "Invalid max_shares value for the given disk size and storage account type."
   }
   validation {
     condition = alltrue([
@@ -413,6 +436,7 @@ variable "tags" {
 
 variable "disk_encryption" {
   description = <<-DOC
+  ```
   Configuration for Azure Disk Encryption extension. When null, no ADE extension is created.
   publisher: (Optional) The publisher of the Azure Disk Encryption extension. Defaults to "Microsoft.Azure.Security".
   type: (Optional) The type of the Azure Disk Encryption extension. Defaults to "AzureDiskEncryptionForLinux".
@@ -426,6 +450,7 @@ variable "disk_encryption" {
     KeyEncryptionKeyURL: The URL of the Key Encryption Key in the Key Vault.
     KekVaultResourceId: The resource ID of the Key Encryption Key Vault.
     VolumeType: (Optional) The type of volume to encrypt. Possible values are "All", "OS", or "Data". Defaults to "All".
+  ```
   DOC
 
   type = object({
@@ -445,12 +470,20 @@ variable "disk_encryption" {
   })
 
   validation {
-    condition     = contains(["All", "OS", "Data"], try(var.disk_encryption.settings.VolumeType, "All"))
-    error_message = "VolumeType must be one of 'All', 'OS', or 'Data'."
+    condition = (
+      var.disk_encryption == null || (var.disk_encryption != null &&
+      contains(["All", "OS", "Data"], try(var.disk_encryption.settings.VolumeType, "All")))
+    )
+    error_message = "VolumeType must be one of 'All', 'OS', or 'Data', when disk_encryption is not null."
   }
-
   validation {
-    condition     = var.disk_encryption == null || var.disk_encryption.settings.KeyVaultURL != ""
+    condition = (
+      var.disk_encryption == null ||
+      (
+        var.disk_encryption.settings != null &&
+        var.disk_encryption.settings.KeyVaultURL != ""
+      )
+    )
     error_message = "KeyVaultURL must be specified when disk_encryption is not null."
   }
 

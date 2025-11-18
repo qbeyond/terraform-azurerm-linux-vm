@@ -77,11 +77,14 @@ resource "azurerm_linux_virtual_machine" "this" {
   size                                                   = var.virtual_machine_config.size
   admin_username                                         = var.admin_username
   admin_password                                         = var.admin_credential.admin_password
-  disable_password_authentication                        = var.admin_credential.admin_password == null
+  disable_password_authentication                        = var.admin_credential.admin_password    == null
   patch_mode                                             = var.update_settings.patch_mode
-  bypass_platform_safety_checks_on_user_schedule_enabled = var.update_settings.patch_mode == "ImageDefault" ? false : var.update_settings.bypass_platform_safety_checks_on_user_schedule_enabled
+  bypass_platform_safety_checks_on_user_schedule_enabled = var.update_settings.patch_mode         == "ImageDefault" ? false : var.update_settings.bypass_platform_safety_checks_on_user_schedule_enabled
   patch_assessment_mode                                  = var.update_settings.patch_assessment_mode
-  reboot_setting                                         = var.update_settings.patch_mode == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
+  reboot_setting                                         = var.update_settings.patch_mode         == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
+  custom_data                                            = var.virtual_machine_config.custom_data == true ? filebase64("${path.module}/cloud-init.yaml") : null
+  vtpm_enabled                                           = var.virtual_machine_config.vtpm_enabled
+  secure_boot_enabled                                    = var.virtual_machine_config.secure_boot_enabled
 
   dynamic "admin_ssh_key" {
     for_each = var.admin_credential.public_key != null ? [1] : []

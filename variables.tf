@@ -154,6 +154,9 @@ variable "virtual_machine_config" {
     severity_group                    = string
     update_allowed                    = optional(bool, true)
     enable_plan                       = optional(bool, false)
+    custom_data                       = optional(bool, false)
+    vtpm_enabled                      = optional(bool, true)
+    secure_boot_enabled               = optional(bool, true)
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)

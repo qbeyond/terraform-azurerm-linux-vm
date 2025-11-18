@@ -7,6 +7,13 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [3.0.0] - 2025-11-18
+
+### Added
+
+- Capability to add custom data and scripts to the virtual machine
+- Added vtpm and secure boot variables
+
 ## [2.1.1] - 2025-10-23
 
 ### Fixed

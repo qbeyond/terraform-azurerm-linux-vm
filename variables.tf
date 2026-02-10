@@ -206,6 +206,9 @@ variable "virtual_machine_config" {
     severity_group: (Required) Sets tag 'Severity Group Monthly' to a specific time and date when an update will be done automatically.
     update_allowed: Sets tag 'Update allowed' to yes or no to specify if this VM should currently receive updates.
     enable_plan: When using marketplace images, sending plan information might be required. Also accepts the terms of the marketplace product.
+    custom_data: Optionally specify a custom data script that should be run during the provisioning of the vm. The script needs to be base64 encoded. If set to true, the module will look for a file called cloud-init.yaml in the module folder and use this as custom data. Defaults to false.
+    vtpm_enabled: Optionally enable vTPM for the VM. Defaults to true.
+    secure_boot_enabled: Optionally enable secure boot for the VM. Defaults to true.
   ```
   DOC
 }

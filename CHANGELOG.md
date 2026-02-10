@@ -7,6 +7,12 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [3.1.0] - 2025-11-18
+
+### Added
+
+- Added documentation for the variables custom_data, vtpm_enabled and secure_boot_enabled
+
 ## [3.0.0] - 2025-11-18
 
 ### Added

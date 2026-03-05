@@ -410,6 +410,8 @@ variable "data_disks" {
     disk_iops_read_only: (Optional) The maximum number of IOPS allowed for the disk in read-only operations.
     disk_mbps_read_only: (Optional) The maximum number of MBps allowed for the disk in read-only operations.
     max_shares: (Optional) The maximum number of VMs that can share this disk. Only for UltraSSD_LRS and PremiumV2_LRS disks.
+    network_access_enabled: (Optional) Policy for accessing the disk via network. Allowed values are AllowAll, AllowPrivate, and DenyAll.
+    public_network_access_enabled: (Optional) Whether it is allowed to access the disk via public network.
    }
   ```
   DOC

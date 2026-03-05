@@ -215,20 +215,22 @@ variable "virtual_machine_config" {
 
 variable "data_disks" {
   type = map(object({
-    lun                        = number
-    disk_size_gb               = number
-    caching                    = optional(string, "ReadWrite")
-    create_option              = optional(string, "Empty")
-    source_resource_id         = optional(string)
-    storage_account_type       = optional(string, "Premium_LRS")
-    write_accelerator_enabled  = optional(bool, false)
-    on_demand_bursting_enabled = optional(bool, false)
-    disk_iops_read_write       = optional(number)
-    disk_mbps_read_write       = optional(number)
-    disk_iops_read_only        = optional(number)
-    disk_mbps_read_only        = optional(number)
-    max_shares                 = optional(number)
-    tags                       = optional(map(string), {})
+    lun                           = number
+    disk_size_gb                  = number
+    caching                       = optional(string, "ReadWrite")
+    create_option                 = optional(string, "Empty")
+    source_resource_id            = optional(string)
+    storage_account_type          = optional(string, "Premium_LRS")
+    write_accelerator_enabled     = optional(bool, false)
+    on_demand_bursting_enabled    = optional(bool, false)
+    disk_iops_read_write          = optional(number)
+    disk_mbps_read_write          = optional(number)
+    disk_iops_read_only           = optional(number)
+    disk_mbps_read_only           = optional(number)
+    max_shares                    = optional(number)
+    network_access_policy         = optional(string)
+    public_network_access_enabled = optional(bool)
+    tags                          = optional(map(string), {})
   }))
   validation {
     condition     = length([for v in var.data_disks : v.lun]) == length(distinct([for v in var.data_disks : v.lun]))
@@ -408,6 +410,8 @@ variable "data_disks" {
     disk_iops_read_only: (Optional) The maximum number of IOPS allowed for the disk in read-only operations.
     disk_mbps_read_only: (Optional) The maximum number of MBps allowed for the disk in read-only operations.
     max_shares: (Optional) The maximum number of VMs that can share this disk. Only for UltraSSD_LRS and PremiumV2_LRS disks.
+    network_access_enabled: (Optional) Policy for accessing the disk via network. Allowed values are AllowAll, AllowPrivate, and DenyAll.
+    public_network_access_enabled: (Optional) Whether it is allowed to access the disk via public network.
    }
   ```
   DOC

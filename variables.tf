@@ -373,11 +373,25 @@ variable "data_disks" {
   validation {
     condition = alltrue([
       for o in var.data_disks : (
-        (o.disk_mbps_read_write == null ? true : (o.disk_mbps_read_write >= 125 && o.disk_mbps_read_write <= 750)) &&
-        (o.disk_mbps_read_only == null ? true : (o.disk_mbps_read_only >= 125 && o.disk_mbps_read_only <= 750))
+        (o.storage_account_type == "StandardSSD_LRS" &&
+          (o.disk_mbps_read_write == null ? true : (o.disk_mbps_read_write >= 125 && o.disk_mbps_read_write <= 750)) &&
+          (o.disk_mbps_read_only == null ? true : (o.disk_mbps_read_only >= 125 && o.disk_mbps_read_only <= 750))
+        ) || 
+        (o.storage_account_type == "Premium_LRS" &&
+          (o.disk_mbps_read_write == null ? true : (o.disk_mbps_read_write >= 125 && o.disk_mbps_read_write <= 900)) &&
+          (o.disk_mbps_read_only == null ? true : (o.disk_mbps_read_only >= 125 && o.disk_mbps_read_only <= 900))
+        ) || 
+        (o.storage_account_type == "PremiumV2_LRS" &&
+          (o.disk_mbps_read_write == null ? true : (o.disk_mbps_read_write >= 125 && o.disk_mbps_read_write <= 2000)) &&
+          (o.disk_mbps_read_only == null ? true : (o.disk_mbps_read_only >= 125 && o.disk_mbps_read_only <= 2000))
+        ) ||
+        (o.storage_account_type == "UltraSSD_LRS" &&
+          (o.disk_mbps_read_write == null ? true : (o.disk_mbps_read_write >= 125 && o.disk_mbps_read_write <= 10000)) &&
+          (o.disk_mbps_read_only == null ? true : (o.disk_mbps_read_only >= 125 && o.disk_mbps_read_only <= 10000))
+        )
       )
     ])
-    error_message = "disk_mbps_read_write and disk_mbps_read_only must be between 125 and 750 if set."
+    error_message = "disk_mbps_read_write and disk_mbps_read_only must be between 125 and 750 for StandardSSD, between 125 and 900 for Premium, between 125 and 2000 for PremiumV2 and between 125 and 10000 for UltraSSD, if set."
   }
   validation {
     condition = alltrue([

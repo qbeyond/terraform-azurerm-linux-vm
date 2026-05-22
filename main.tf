@@ -70,18 +70,19 @@ resource "azurerm_marketplace_agreement" "default" {
 }
 
 resource "azurerm_linux_virtual_machine" "this" {
+  count                                                  = var.is_imported ? 0 : 1
   name                                                   = local.virtual_machine.name
-  computer_name                                          = var.virtual_machine_config.hostname
+  computer_name                                          = var.name_overrides.hostname != null ? var.name_overrides.hostname : var.virtual_machine_config.hostname
   location                                               = var.virtual_machine_config.location
   resource_group_name                                    = var.resource_group_name
   size                                                   = var.virtual_machine_config.size
   admin_username                                         = var.admin_username
   admin_password                                         = var.admin_credential.admin_password
-  disable_password_authentication                        = var.admin_credential.admin_password    == null
+  disable_password_authentication                        = var.admin_credential.admin_password == null
   patch_mode                                             = var.update_settings.patch_mode
-  bypass_platform_safety_checks_on_user_schedule_enabled = var.update_settings.patch_mode         == "ImageDefault" ? false : var.update_settings.bypass_platform_safety_checks_on_user_schedule_enabled
+  bypass_platform_safety_checks_on_user_schedule_enabled = var.update_settings.patch_mode == "ImageDefault" ? false : var.update_settings.bypass_platform_safety_checks_on_user_schedule_enabled
   patch_assessment_mode                                  = var.update_settings.patch_assessment_mode
-  reboot_setting                                         = var.update_settings.patch_mode         == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
+  reboot_setting                                         = var.update_settings.patch_mode == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
   custom_data                                            = var.virtual_machine_config.custom_data == true ? filebase64("${path.module}/cloud-init.yaml") : null
   vtpm_enabled                                           = var.virtual_machine_config.vtpm_enabled
   secure_boot_enabled                                    = var.virtual_machine_config.secure_boot_enabled
@@ -92,6 +93,23 @@ resource "azurerm_linux_virtual_machine" "this" {
       username   = var.admin_username
       public_key = var.admin_credential.public_key
     }
+  }
+
+  dynamic "identity" {
+    for_each = var.virtual_machine_config.identity == null ? [] : [var.virtual_machine_config.identity]
+    content {
+      type         = identity.value.identity_type
+      identity_ids = identity.value.identity_ids
+    }
+  }
+
+  additional_capabilities {
+    ultra_ssd_enabled   = var.virtual_machine_config.additional_capabilities.ultra_ssd_enabled
+    hibernation_enabled = var.virtual_machine_config.additional_capabilities.hibernation_enabled
+  }
+
+  boot_diagnostics {
+    storage_account_uri = var.virtual_machine_config.boot_diagnostics.storage_account_uri
   }
 
   os_disk {
@@ -138,7 +156,93 @@ resource "azurerm_linux_virtual_machine" "this" {
   ]
 }
 
+resource "azurerm_linux_virtual_machine" "imported" {
+  count                                                  = var.is_imported ? 1 : 0
+  name                                                   = local.virtual_machine.name
+  computer_name                                          = var.name_overrides.hostname != null ? var.name_overrides.hostname : var.virtual_machine_config.hostname
+  location                                               = var.virtual_machine_config.location
+  resource_group_name                                    = var.resource_group_name
+  size                                                   = var.virtual_machine_config.size
+  admin_username                                         = var.admin_username
+  admin_password                                         = var.admin_credential.admin_password
+  disable_password_authentication                        = var.admin_credential.admin_password == null
+  patch_mode                                             = var.update_settings.patch_mode
+  bypass_platform_safety_checks_on_user_schedule_enabled = var.update_settings.patch_mode == "ImageDefault" ? false : var.update_settings.bypass_platform_safety_checks_on_user_schedule_enabled
+  patch_assessment_mode                                  = var.update_settings.patch_assessment_mode
+  reboot_setting                                         = var.update_settings.patch_mode == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
+  custom_data                                            = var.virtual_machine_config.custom_data == true ? filebase64("${path.module}/cloud-init.yaml") : null
+  vtpm_enabled                                           = var.virtual_machine_config.vtpm_enabled
+  secure_boot_enabled                                    = var.virtual_machine_config.secure_boot_enabled
 
+  dynamic "admin_ssh_key" {
+    for_each = var.admin_credential.public_key != null ? [1] : []
+    content {
+      username   = var.admin_username
+      public_key = var.admin_credential.public_key
+    }
+  }
+
+  dynamic "identity" {
+    for_each = var.virtual_machine_config.identity == null ? [] : [var.virtual_machine_config.identity]
+    content {
+      type         = identity.value.identity_type
+      identity_ids = identity.value.identity_ids
+    }
+  }
+
+  additional_capabilities {
+    ultra_ssd_enabled   = var.virtual_machine_config.additional_capabilities.ultra_ssd_enabled
+    hibernation_enabled = var.virtual_machine_config.additional_capabilities.hibernation_enabled
+  }
+
+  boot_diagnostics {
+    storage_account_uri = var.virtual_machine_config.boot_diagnostics.storage_account_uri
+  }
+
+  os_disk {
+    name                      = local.os_disk_name
+    caching                   = var.virtual_machine_config.os_disk_caching
+    disk_size_gb              = var.virtual_machine_config.os_disk_size_gb
+    storage_account_type      = var.virtual_machine_config.os_disk_storage_type
+    write_accelerator_enabled = var.virtual_machine_config.os_disk_write_accelerator_enabled
+  }
+
+  source_image_reference {
+    publisher = var.virtual_machine_config.os_publisher
+    offer     = var.virtual_machine_config.os_offer
+    sku       = var.virtual_machine_config.os_sku
+    version   = var.virtual_machine_config.os_version
+  }
+
+  dynamic "plan" {
+    for_each = var.virtual_machine_config.enable_plan ? ["one"] : []
+    content {
+      name      = var.virtual_machine_config.os_sku
+      product   = var.virtual_machine_config.os_offer
+      publisher = var.virtual_machine_config.os_publisher
+    }
+  }
+
+  proximity_placement_group_id = var.virtual_machine_config.proximity_placement_group_id
+  network_interface_ids        = concat([azurerm_network_interface.this.id], var.additional_network_interface_ids)
+  availability_set_id          = var.virtual_machine_config.availability_set_id
+  zone                         = var.virtual_machine_config.zone
+  tags                         = local.virtual_machine.tags
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      identity,
+      admin_password,
+      admin_ssh_key,
+      disable_password_authentication,
+    ]
+  }
+
+  depends_on = [
+    azurerm_marketplace_agreement.default
+  ]
+}
 
 resource "azurerm_virtual_machine_extension" "python_setup" {
   count                = var.disk_encryption != null ? 1 : 0

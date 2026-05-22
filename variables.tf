@@ -157,6 +157,21 @@ variable "virtual_machine_config" {
     custom_data                       = optional(bool, false)
     vtpm_enabled                      = optional(bool, true)
     secure_boot_enabled               = optional(bool, true)
+
+    additional_capabilities = optional(object({
+      ultra_ssd_enabled   = optional(bool, false)
+      hibernation_enabled = optional(bool, false)
+    }), {})
+
+    identity = optional(object({
+      identity_type = optional(string, null)
+      identity_ids  = optional(list(string), null)
+    }))
+
+    boot_diagnostics = optional(object({
+      storage_account_uri = optional(string, null)
+    }), {})
+
   })
   validation {
     condition     = contains(["None", "ReadOnly", "ReadWrite"], var.virtual_machine_config.os_disk_caching)
@@ -209,6 +224,14 @@ variable "virtual_machine_config" {
     custom_data: Optionally specify a custom data script that should be run during the provisioning of the vm. The script needs to be base64 encoded. If set to true, the module will look for a file called cloud-init.yaml in the module folder and use this as custom data. Defaults to false.
     vtpm_enabled: Optionally enable vTPM for the VM. Defaults to true.
     secure_boot_enabled: Optionally enable secure boot for the VM. Defaults to true.
+    additional_capabilities: (Optional) Additional capabilities for the virtual machine.
+      ultra_ssd_enabled: (Optional) Enable UltraSSD_LRS for the virtual machine. Defaults to false.
+      hibernation_enabled: (Optional) Enable hibernation for the virtual machine. Defaults to false.       
+    identity: (Optional) Identity configuration for the virtual machine.
+      identity_type: (Optional) The type of identity used for the Virtual Machine. Possible values are 'SystemAssigned', 'UserAssigned', 'SystemAssigned, UserAssigned' and null. Defaults to null.
+      identity_ids: (Optional) List of User Assigned Identity IDs when identity_type is set to 'UserAssigned' or 'SystemAssigned, UserAssigned'. Defaults to null.
+    boot_diagnostics: (Optional) Boot diagnostics configuration for the virtual machine.
+      storage_account_uri: (Optional) The URI of the storage account to use for boot diagnostics. Defaults to null.
   ```
   DOC
 }
@@ -424,6 +447,21 @@ variable "data_disks" {
   DOC
 }
 
+variable "is_imported" {
+  type        = bool
+  nullable    = false
+  default     = false
+  description = <<-DOC
+  ```
+    Optianally. Specify whether the VM is imported from an existing VM. Defaults to false. 
+    If the VM is imported (true) the resource will not try to change the following properties: 
+    VM: identity, source_image_reference, source_image_id, timezone, admin_username, computer_name, admin_password 
+    Data Disk: upload_size_bytes, create_option, source_resource_id
+    Data Disk Attachment: virtual_machine_id, managed_disk_id
+  ```
+  DOC
+}
+
 variable "resource_group_name" {
   type        = string
   nullable    = false
@@ -437,6 +475,7 @@ variable "name_overrides" {
     public_ip       = optional(string)
     virtual_machine = optional(string)
     os_disk         = optional(string)
+    hostname        = optional(string)
     data_disks      = optional(map(string), {})
   })
   default     = {}

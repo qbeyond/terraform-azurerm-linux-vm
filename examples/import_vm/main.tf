@@ -3,7 +3,7 @@
 # 2. Fill in the subscription_id in the provider block of this example and adjust the import blocks to match the existing Resources.
 # 3. Run this example and try to import the existing VM into the state file of this example.
 # 4. If all resources get imported successfully, the Module works as intended.
-# (There are two error build in to test the correction of the name_overrides. The hostname and RG name)
+# (There are one error build in to test the correction of the name_overrides. The RG name)
 provider "azurerm" {
   subscription_id = "<Subscription ID>" # <-- Fill in Subscription ID
   features {}
@@ -22,7 +22,7 @@ module "virtual_machine" {
     os_publisher   = "Canonical"
     severity_group = "01-second-monday-0300-XCSUFEDTG-reboot"
   }
-  
+
   admin_username = "local_admin"
   admin_credential = {
     admin_password = "H3ll0W0rld!"
@@ -32,11 +32,13 @@ module "virtual_machine" {
   subnet              = azurerm_subnet.this
 
   name_overrides = {
-    hostname                      = "CUSTAPP001"
-    virtual_machine               = "vm-CUSTAPP001"
-    os_disk                       = "disk-CUSTAPP001-Os"
-    nic                           = "nic-CUSTAPP001-10-0-0-0-24"
-    data_disks                    = { "Data00" = "disk-CUSTAPP001-Data00" }
+    hostname                = "CUSTAPP001"
+    virtual_machine         = "vm-CUSTAPP001"
+    os_disk                 = "disk-CUSTAPP001-Os"
+    nic                     = "nic-CUSTAPP001-10-0-0-0-24"
+    resource_group_name_vm  = "rg-TestLinuxBasic-tst-01"
+    resource_group_name_nic = "rg-TestLinuxBasic-tst-01"
+    data_disks              = { "Data00" = "disk-CUSTAPP001-Data00" }
   }
 }
 

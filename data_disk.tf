@@ -29,7 +29,7 @@ resource "azurerm_managed_disk" "data_disk" {
 resource "azurerm_virtual_machine_data_disk_attachment" "data_disk" {
   for_each                  = var.data_disks
   managed_disk_id           = azurerm_managed_disk.data_disk[each.key].id
-  virtual_machine_id        = azurerm_linux_virtual_machine.this.id
+  virtual_machine_id        = length(azurerm_linux_virtual_machine.this) > 0 ? azurerm_linux_virtual_machine.this[0].id : azurerm_linux_virtual_machine.imported[0].id
   lun                       = each.value["lun"]
   caching                   = each.value["caching"]
   write_accelerator_enabled = each.value["write_accelerator_enabled"]

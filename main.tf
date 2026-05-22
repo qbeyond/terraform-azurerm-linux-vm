@@ -247,7 +247,7 @@ resource "azurerm_linux_virtual_machine" "imported" {
 resource "azurerm_virtual_machine_extension" "python_setup" {
   count                = var.disk_encryption != null ? 1 : 0
   name                 = "${var.virtual_machine_config.hostname}-pythonSetup"
-  virtual_machine_id   = azurerm_linux_virtual_machine.this.id
+  virtual_machine_id   = length(azurerm_linux_virtual_machine.this) > 0 ? azurerm_linux_virtual_machine.this[0].id : azurerm_linux_virtual_machine.imported[0].id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
   type_handler_version = "2.1"
@@ -262,7 +262,7 @@ SETTINGS
 resource "azurerm_virtual_machine_extension" "disk_encryption" {
   count                      = var.disk_encryption != null ? 1 : 0
   name                       = "${var.virtual_machine_config.hostname}-diskEncryption"
-  virtual_machine_id         = azurerm_linux_virtual_machine.this.id
+  virtual_machine_id         = length(azurerm_linux_virtual_machine.this) > 0 ? azurerm_linux_virtual_machine.this[0].id : azurerm_linux_virtual_machine.imported[0].id
   publisher                  = var.disk_encryption.publisher
   type                       = var.disk_encryption.type
   type_handler_version       = var.disk_encryption.type_handler_version

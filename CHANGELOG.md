@@ -14,6 +14,7 @@ and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 - Added additional_capabilities block
 - Added identity block
 - Added boot_diagnostic block
+- Added new example to test the import of a VM
 - Edited Documentation
 
 ## [3.3.0] - 2026-05-11

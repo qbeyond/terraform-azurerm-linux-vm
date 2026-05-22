@@ -5,6 +5,17 @@ All notable changes to this module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2026-05-11
+
+### Added
+
+- Added is_imported variable to specify a existing VM, that needs to be imported with this module. With the value true the module will ignore the following changes: identity, admin_password, admin_ssh_key, disable_password_authentication
+- Added new name overrides into the module
+- Added additional_capabilities block
+- Added identity block
+- Added boot_diagnostic block
+- Edited Documentation
+
 ## [3.3.0] - 2026-05-11
 
 ### Added

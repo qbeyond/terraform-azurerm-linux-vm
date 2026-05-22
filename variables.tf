@@ -455,9 +455,7 @@ variable "is_imported" {
   ```
     Optianally. Specify whether the VM is imported from an existing VM. Defaults to false. 
     If the VM is imported (true) the resource will not try to change the following properties: 
-    VM: identity, source_image_reference, source_image_id, timezone, admin_username, computer_name, admin_password 
-    Data Disk: upload_size_bytes, create_option, source_resource_id
-    Data Disk Attachment: virtual_machine_id, managed_disk_id
+    VM: identity, admin_password, admin_ssh_key, disable_password_authentication
   ```
   DOC
 }

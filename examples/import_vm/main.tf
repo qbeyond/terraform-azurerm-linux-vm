@@ -61,25 +61,25 @@ resource "azurerm_subnet" "this" {
 
 import {
   to = module.virtual_machine.azurerm_linux_virtual_machine.imported[0]
-  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-examples_vm_deploy-01/providers/Microsoft.Compute/virtualMachines/vm-CUSTAPP001" # <-- Fill in Resource ID of the existing VM
+  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01/providers/Microsoft.Compute/virtualMachines/vm-CUSTAPP001" # <-- Fill in Resource ID of the existing VM
 }
 
 import {
   to = module.virtual_machine.azurerm_network_interface.this
-  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-examples_vm_deploy-01/providers/Microsoft.Network/networkInterfaces/nic-CUSTAPP001-10-0-0-0-24" # <-- Fill in Resource ID of the existing NIC
+  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01/providers/Microsoft.Network/networkInterfaces/nic-CUSTAPP001-10-0-0-0-24" # <-- Fill in Resource ID of the existing NIC
 }
 
 import {
   to = azurerm_virtual_network.this
-  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-examples_vm_deploy-01/providers/Microsoft.Network/virtualNetworks/vnet-examples_vm_deploy-01" # <-- Fill in Resource ID of the existing VNet
+  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01/providers/Microsoft.Network/virtualNetworks/vnet-examples_vm_deploy-01" # <-- Fill in Resource ID of the existing VNet
 }
 
 import {
   to = azurerm_subnet.this
-  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-examples_vm_deploy-01/providers/Microsoft.Network/virtualNetworks/vnet-examples_vm_deploy-01/subnets/snet-examples_vm_deploy-01" # <-- Fill in Resource ID of the existing Subnet
+  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01/providers/Microsoft.Network/virtualNetworks/vnet-examples_vm_deploy-01/subnets/snet-examples_vm_deploy-01" # <-- Fill in Resource ID of the existing Subnet
 }
 
 import {
   to = azurerm_resource_group.this
-  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-examples_vm_deploy-01" # <-- Fill in Resource ID of the existing Resource Group
+  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01" # <-- Fill in Resource ID of the existing Resource Group
 }

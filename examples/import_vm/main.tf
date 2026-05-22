@@ -60,7 +60,7 @@ resource "azurerm_subnet" "this" {
 }
 
 import {
-  to = module.virtual_machine.azurerm_windows_virtual_machine.imported[0]
+  to = module.virtual_machine.azurerm_linux_virtual_machine.imported[0]
   id = "/subscriptions/<Subscription ID>/resourceGroups/rg-examples_vm_deploy-01/providers/Microsoft.Compute/virtualMachines/vm-CUSTAPP001" # <-- Fill in Resource ID of the existing VM
 }
 

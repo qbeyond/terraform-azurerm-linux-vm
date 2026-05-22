@@ -41,7 +41,7 @@ module "virtual_machine" {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = "rg-examples_vm_deploy-01"
+  name     = local.resource_group_name
   location = local.location
 }
 

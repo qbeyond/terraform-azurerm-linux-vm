@@ -43,7 +43,7 @@ module "virtual_machine" {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = local.resource_group_name
+  name     = "rg-TestLinuxBasic-tst-01"
   location = local.location
 }
 
@@ -51,12 +51,12 @@ resource "azurerm_virtual_network" "this" {
   name                = local.virtual_network_name
   address_space       = ["10.0.0.0/24"]
   location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = "rg-TestLinuxBasic-tst-01"
 }
 
 resource "azurerm_subnet" "this" {
   name                 = local.subnet_name
-  resource_group_name  = azurerm_resource_group.this.name
+  resource_group_name  = "rg-TestLinuxBasic-tst-01"
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = ["10.0.0.0/24"]
 }

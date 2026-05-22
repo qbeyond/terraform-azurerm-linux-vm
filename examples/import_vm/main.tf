@@ -15,7 +15,7 @@ module "virtual_machine" {
   virtual_machine_config = {
     hostname       = "CUSTAPP001"
     location       = azurerm_resource_group.this.location
-    size           = "Standard_B1ms"
+    size           = "Standard_D2as_v6"
     os_sku         = "22_04-lts-gen2"
     os_offer       = "0001-com-ubuntu-server-jammy"
     os_version     = "latest"

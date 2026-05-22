@@ -71,12 +71,12 @@ import {
 
 import {
   to = azurerm_virtual_network.this
-  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01/providers/Microsoft.Network/virtualNetworks/vnet-examples_vm_deploy-01" # <-- Fill in Resource ID of the existing VNet
+  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01/providers/Microsoft.Network/virtualNetworks/vnet-10-0-0-0-24-westeurope" # <-- Fill in Resource ID of the existing VNet
 }
 
 import {
   to = azurerm_subnet.this
-  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01/providers/Microsoft.Network/virtualNetworks/vnet-examples_vm_deploy-01/subnets/snet-examples_vm_deploy-01" # <-- Fill in Resource ID of the existing Subnet
+  id = "/subscriptions/<Subscription ID>/resourceGroups/rg-TestLinuxBasic-tst-01/providers/Microsoft.Network/virtualNetworks/vnet-10-0-0-0-24-westeurope/subnets/snet-10-0-0-0-24-Test" # <-- Fill in Resource ID of the existing Subnet
 }
 
 import {

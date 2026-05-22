@@ -12,8 +12,8 @@ variable "public_ip_config" {
 
   validation {
     condition = (
-      var.public_ip_config == null || 
-      var.virtual_machine_config.zone == null || 
+      var.public_ip_config == null ||
+      var.virtual_machine_config.zone == null ||
       var.public_ip_config.sku == "Standard"
     )
     error_message = "If a zone is specified, the Public IP SKU must be set to 'Standard'."
@@ -470,13 +470,17 @@ variable "resource_group_name" {
 
 variable "name_overrides" {
   type = object({
-    nic             = optional(string)
-    nic_ip_config   = optional(string)
-    public_ip       = optional(string)
-    virtual_machine = optional(string)
-    os_disk         = optional(string)
-    hostname        = optional(string)
-    data_disks      = optional(map(string), {})
+    nic                           = optional(string)
+    nic_ip_config                 = optional(string)
+    public_ip                     = optional(string)
+    virtual_machine               = optional(string)
+    os_disk                       = optional(string)
+    hostname                      = optional(string)
+    data_disks                    = optional(map(string), {})
+    resource_group_name_vm        = optional(string)
+    resource_group_name_nic       = optional(string)
+    resource_group_name_data_disk = optional(string)
+    resource_group_name_public_ip = optional(string)
   })
   default     = {}
   nullable    = false

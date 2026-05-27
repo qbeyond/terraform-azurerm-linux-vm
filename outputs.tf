@@ -1,5 +1,5 @@
 output "virtual_machine" {
-  value = azurerm_linux_virtual_machine.this
+  value = length(azurerm_linux_virtual_machine.this) > 0 ? azurerm_linux_virtual_machine.this[0] : azurerm_linux_virtual_machine.imported[0]
 }
 
 output "data_disks" {

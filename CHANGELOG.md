@@ -5,6 +5,12 @@ All notable changes to this module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2026-06-09
+
+### Removed
+
+- Removed Azure Disk Encryption (ADE) support. ADE is scheduled for retirement on September 15, 2028. Use encryption at host for new VMs instead.
+
 ## [4.0.0] - 2026-05-11
 
 ### Added

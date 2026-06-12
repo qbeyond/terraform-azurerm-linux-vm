@@ -243,34 +243,3 @@ resource "azurerm_linux_virtual_machine" "imported" {
     azurerm_marketplace_agreement.default
   ]
 }
-
-resource "azurerm_virtual_machine_extension" "python_setup" {
-  count                = var.disk_encryption != null ? 1 : 0
-  name                 = "${var.virtual_machine_config.hostname}-pythonSetup"
-  virtual_machine_id   = length(azurerm_linux_virtual_machine.this) > 0 ? azurerm_linux_virtual_machine.this[0].id : azurerm_linux_virtual_machine.imported[0].id
-  publisher            = "Microsoft.Azure.Extensions"
-  type                 = "CustomScript"
-  type_handler_version = "2.1"
-
-  settings = <<SETTINGS
-{
-  "commandToExecute": "bash -c 'apt-get update -y && apt-get install -y python2 || apt-get install -y python-is-python2; ln -sf /usr/bin/python2 /usr/bin/python'"
-}
-SETTINGS
-}
-
-resource "azurerm_virtual_machine_extension" "disk_encryption" {
-  count                      = var.disk_encryption != null ? 1 : 0
-  name                       = "${var.virtual_machine_config.hostname}-diskEncryption"
-  virtual_machine_id         = length(azurerm_linux_virtual_machine.this) > 0 ? azurerm_linux_virtual_machine.this[0].id : azurerm_linux_virtual_machine.imported[0].id
-  publisher                  = var.disk_encryption.publisher
-  type                       = var.disk_encryption.type
-  type_handler_version       = var.disk_encryption.type_handler_version
-  auto_upgrade_minor_version = var.disk_encryption.auto_upgrade_minor_version
-  tags                       = var.tags
-  settings                   = jsonencode(var.disk_encryption.settings)
-
-  depends_on = [
-    azurerm_virtual_machine_extension.python_setup
-  ]
-}

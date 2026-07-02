@@ -1,5 +1,5 @@
 resource "azurerm_public_ip" "this" {
-  count               = var.public_ip_config != null ? 1 : 0
+  count               = var.public_ip_config.enabled ? 1 : 0
   name                = local.public_ip.name
   resource_group_name = var.name_overrides.resource_group_name_public_ip != null ? var.name_overrides.resource_group_name_public_ip : var.resource_group_name
   location            = var.virtual_machine_config.location

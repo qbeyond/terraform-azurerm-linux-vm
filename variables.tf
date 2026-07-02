@@ -1,10 +1,13 @@
 variable "public_ip_config" {
   type = object({
+    enabled = bool
     allocation_method = optional(string, "Static")
     stage             = string
     sku               = optional(string, "Standard")
   })
-  default = null
+  default = {
+    enabled = false
+  }
   validation {
     condition     = var.public_ip_config != null ? contains(["Static", "Dynamic"], var.public_ip_config.allocation_method) : true
     error_message = "Allocation method must be Static or Dynamic"

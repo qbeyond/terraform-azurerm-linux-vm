@@ -7,9 +7,10 @@ variable "public_ip_config" {
   })
   default = {
     enabled = false
+    stage = null
   }
   validation {
-    condition     = var.public_ip_config != null ? contains(["Static", "Dynamic"], var.public_ip_config.allocation_method) : true
+    condition     = var.public_ip_config.enabled ? contains(["Static", "Dynamic"], var.public_ip_config.allocation_method) : true
     error_message = "Allocation method must be Static or Dynamic"
   }
 

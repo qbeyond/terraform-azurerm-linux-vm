@@ -25,7 +25,7 @@ resource "azurerm_network_interface" "this" {
     private_ip_address_allocation = var.nic_config.private_ip == null ? "Dynamic" : "Static"
     private_ip_address            = var.nic_config.private_ip
     primary                       = true
-    public_ip_address_id          = var.public_ip_config != null ? azurerm_public_ip.this[0].id : null
+    public_ip_address_id          = var.public_ip_config.enabled ? azurerm_public_ip.this[0].id : null
   }
 
   # additional IP configurations

@@ -1,6 +1,6 @@
 variable "public_ip_config" {
   type = object({
-    enabled = bool
+    enabled           = bool
     allocation_method = optional(string, "Static")
     stage             = string
     sku               = optional(string, "Standard")
@@ -24,6 +24,7 @@ variable "public_ip_config" {
   }
   description = <<-DOC
   ```
+    enabled: Optionally select true if a public ip should be created. Defaults to false.
     allocation_method: The allocation method of the public ip that will be created. Defaults to static.
     stage: The stage of this PIP. Ex: prd, dev, tst, ...
     sku: Optionally specify the sku of the public ip. Defaults to Standard.

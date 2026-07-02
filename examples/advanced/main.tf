@@ -118,7 +118,7 @@ resource "azurerm_proximity_placement_group" "this" {
 }
 
 resource "azurerm_network_interface" "additional_nic_01" {
-  name                = "nic-${local.hostname}-${replace(element(azurerm_virtual_network.this.address_space, 0), "/[./]/", "-")}-02"
+  name                = "nic-${local.hostname}-10-0-0-0-24-02"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   dns_servers         = []

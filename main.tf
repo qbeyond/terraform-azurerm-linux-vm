@@ -1,5 +1,5 @@
 resource "azurerm_public_ip" "this" {
-  count               = var.public_ip_config != null ? 1 : 0
+  count               = var.public_ip_config.enabled ? 1 : 0
   name                = local.public_ip.name
   resource_group_name = var.name_overrides.resource_group_name_public_ip != null ? var.name_overrides.resource_group_name_public_ip : var.resource_group_name
   location            = var.virtual_machine_config.location
@@ -25,7 +25,7 @@ resource "azurerm_network_interface" "this" {
     private_ip_address_allocation = var.nic_config.private_ip == null ? "Dynamic" : "Static"
     private_ip_address            = var.nic_config.private_ip
     primary                       = true
-    public_ip_address_id          = var.public_ip_config != null ? azurerm_public_ip.this[0].id : null
+    public_ip_address_id          = var.public_ip_config.enabled ? azurerm_public_ip.this[0].id : null
   }
 
   # additional IP configurations

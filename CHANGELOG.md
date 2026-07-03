@@ -5,6 +5,16 @@ All notable changes to this module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2026-05-11
+
+### Added
+
+- Added new validation and a new variable called "enabled" to the public IP. Now it is the same as in the windows module
+
+### Fixed
+
+- Fixed a bug in the advanced module
+
 ## [5.0.0] - 2026-06-09
 
 ### Removed

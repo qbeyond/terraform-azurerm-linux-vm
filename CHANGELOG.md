@@ -5,7 +5,17 @@ All notable changes to this module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.1.0] - 2026-05-11
+## [5.1.1] - 2026-07-08
+
+### Added
+
+- Added new validation for stage variable in public ip
+
+### Fixed
+
+- Fixed a bug in the public ip
+
+## [5.1.0] - 2026-07-03
 
 ### Added
 

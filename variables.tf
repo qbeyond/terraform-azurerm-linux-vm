@@ -2,12 +2,11 @@ variable "public_ip_config" {
   type = object({
     enabled           = bool
     allocation_method = optional(string, "Static")
-    stage             = string
+    stage             = optional(string, null)
     sku               = optional(string, "Standard")
   })
   default = {
     enabled = false
-    stage = null
   }
   validation {
     condition     = var.public_ip_config.enabled ? contains(["Static", "Dynamic"], var.public_ip_config.allocation_method) : true
@@ -15,18 +14,19 @@ variable "public_ip_config" {
   }
 
   validation {
-    condition = (
-      var.public_ip_config == null ||
-      var.virtual_machine_config.zone == null ||
-      var.public_ip_config.sku == "Standard"
-    )
+    condition     = var.public_ip_config.enabled && var.virtual_machine_config.zone != null ? var.public_ip_config.sku == "Standard" : true
     error_message = "If a zone is specified, the Public IP SKU must be set to 'Standard'."
+  }
+
+  validation {
+    condition     = var.public_ip_config.enabled ? var.public_ip_config.stage != null && contains(["dev", "qas", "prd", "tst"], var.public_ip_config.stage) : true
+    error_message = "The stage must be dev, qas, tst or prd"
   }
   description = <<-DOC
   ```
     enabled: Optionally select true if a public ip should be created. Defaults to false.
     allocation_method: The allocation method of the public ip that will be created. Defaults to static.
-    stage: The stage of this PIP. Ex: prd, dev, tst, ...
+    stage: The stage of the PIP. Ex: prd, dev, tst, ...
     sku: Optionally specify the sku of the public ip. Defaults to Standard.
   ```
   DOC

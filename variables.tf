@@ -20,7 +20,7 @@ variable "public_ip_config" {
 
   validation {
     condition     = var.public_ip_config.enabled ? var.public_ip_config.stage != null && contains(["dev", "qas", "prd", "tst"], var.public_ip_config.stage) : true
-    error_message = "The stage must be dev, qas, tst and prd"
+    error_message = "The stage must be dev, qas, tst or prd"
   }
   description = <<-DOC
   ```

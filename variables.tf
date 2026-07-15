@@ -242,7 +242,7 @@ variable "virtual_machine_config" {
     update_allowed: Sets tag 'Update allowed' to yes or no to specify if this VM should currently receive updates.
     enable_plan: When using marketplace images, sending plan information might be required. Also accepts the terms of the marketplace product.
     custom_data: Optionally specify a custom data script that should be run during the provisioning of the vm. The script needs to be base64 encoded. If set to true, the module will look for a file called cloud-init.yaml in the module folder and use this as custom data. Defaults to false.
-    custom_data_path: Optionally specify a custom data path of the script that should be run during the provisioning of the vm.
+    custom_data_path: Optionally specify a custom data path of the script that should be run during the provisioning of the vm. This must be given, if custom_data is true.
     vtpm_enabled: Optionally enable vTPM for the VM. Defaults to true.
     secure_boot_enabled: Optionally enable secure boot for the VM. Defaults to true.
     additional_capabilities: (Optional) Additional capabilities for the virtual machine.

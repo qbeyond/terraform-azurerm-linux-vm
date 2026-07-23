@@ -34,13 +34,22 @@ variable "public_ip_config" {
 
 variable "additional_ip_configurations" {
   type = map(object({
-    private_ip           = optional(string)
-    public_ip_address_id = optional(string)
+    subnet_id                  = string
+    private_ip_address         = optional(string)
+    private_ip_address_version = optional(string, "IPv4")
+    public_ip_address_id       = optional(string)
   }))
   default     = {}
   nullable    = false
-  description = "List of additional ip configurations for a nic."
-
+  description = <<-DOC
+  ```
+    Map of additional IP configurations for the NIC. The key is used as the IP configuration name.
+    subnet_id: The subnet id for this IP configuration.
+    private_ip_address: Optionally specify a static private IP address. If omitted, a dynamic address is allocated.
+    private_ip_address_version: The IP version to use. Defaults to IPv4.
+    public_ip_address_id: Optionally specify a public IP address id to associate.
+  ```
+  DOC
 }
 
 # nsg needs to be an object to use the count object in main.tf. 
@@ -160,6 +169,7 @@ variable "virtual_machine_config" {
     update_allowed                    = optional(bool, true)
     enable_plan                       = optional(bool, false)
     custom_data                       = optional(bool, false)
+    custom_data_path                  = optional(string, null)
     vtpm_enabled                      = optional(bool, true)
     secure_boot_enabled               = optional(bool, true)
 
@@ -205,6 +215,11 @@ variable "virtual_machine_config" {
     error_message = "Either 'zone' or 'availability_set_id' can be set, but not both."
   }
 
+  validation {
+    condition = var.virtual_machine_config.custom_data == true ? var.virtual_machine_config.custom_data_path != null : true
+    error_message = "When custom_data is true, a custom data path must be provided."
+  }
+
   nullable    = false
   description = <<-DOC
   ```
@@ -227,6 +242,7 @@ variable "virtual_machine_config" {
     update_allowed: Sets tag 'Update allowed' to yes or no to specify if this VM should currently receive updates.
     enable_plan: When using marketplace images, sending plan information might be required. Also accepts the terms of the marketplace product.
     custom_data: Optionally specify a custom data script that should be run during the provisioning of the vm. The script needs to be base64 encoded. If set to true, the module will look for a file called cloud-init.yaml in the module folder and use this as custom data. Defaults to false.
+    custom_data_path: Optionally specify a custom data path of the script that should be run during the provisioning of the vm. This must be given, if custom_data is true.
     vtpm_enabled: Optionally enable vTPM for the VM. Defaults to true.
     secure_boot_enabled: Optionally enable secure boot for the VM. Defaults to true.
     additional_capabilities: (Optional) Additional capabilities for the virtual machine.

@@ -22,8 +22,9 @@ module "virtual_machine" {
     asg                           = azurerm_application_security_group.this
   }
   additional_ip_configurations = {
-    cluster_ip = {
-      private_ip = "10.0.0.17"
+    "secondary" = {
+      subnet_id          = azurerm_subnet.this.id
+      private_ip_address = "10.0.0.17"
     }
   }
   virtual_machine_config = {

@@ -10,7 +10,7 @@ locals {
 
   nic = {
     name           = coalesce(var.name_overrides.nic, "nic-${var.virtual_machine_config.hostname}-${local.subnet_prefix}")
-    ip_config_name = coalesce(var.name_overrides.nic_ip_config, "internal")
+    ip_config_name = coalesce(var.name_overrides.nic_ip_config, "primary-ip-configuration")
   }
 
   virtual_machine = {

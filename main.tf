@@ -33,11 +33,12 @@ resource "azurerm_network_interface" "this" {
     for_each = var.additional_ip_configurations
     content {
       name                          = ip_configuration.key
-      subnet_id                     = var.subnet.id
-      private_ip_address_allocation = ip_configuration.value["private_ip"] == null ? "Dynamic" : "Static"
-      private_ip_address            = ip_configuration.value["private_ip"]
+      subnet_id                     = ip_configuration.value.subnet_id
+      private_ip_address_allocation = ip_configuration.value.private_ip_address == null ? "Dynamic" : "Static"
+      private_ip_address            = ip_configuration.value.private_ip_address
+      private_ip_address_version    = ip_configuration.value.private_ip_address_version
+      public_ip_address_id          = ip_configuration.value.public_ip_address_id
       primary                       = false
-      public_ip_address_id          = ip_configuration.value["public_ip_address_id"] != null ? ip_configuration.value["public_ip_address_id"] : null
     }
   }
 }
@@ -83,7 +84,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   bypass_platform_safety_checks_on_user_schedule_enabled = var.update_settings.patch_mode == "ImageDefault" ? false : var.update_settings.bypass_platform_safety_checks_on_user_schedule_enabled
   patch_assessment_mode                                  = var.update_settings.patch_assessment_mode
   reboot_setting                                         = var.update_settings.patch_mode == "AutomaticByPlatform" ? var.update_settings.reboot_setting : null
-  custom_data                                            = var.virtual_machine_config.custom_data == true ? filebase64("${path.module}/cloud-init.yaml") : null
+  custom_data                                            = var.virtual_machine_config.custom_data == true ? filebase64(var.virtual_machine_config.custom_data_path) : null
   vtpm_enabled                                           = var.virtual_machine_config.vtpm_enabled
   secure_boot_enabled                                    = var.virtual_machine_config.secure_boot_enabled
 

@@ -5,6 +5,17 @@ All notable changes to this module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.0] - 2026-07-15
+
+### Added
+
+- Added `additional_ip_configurations` variable to allow adding multiple IP configurations to the NIC.
+- The default ip configuratin has been renamed from `internal` to `primary-ip-configuration`. To use this and all following versions with existing deployments the `name_overrides` variable needs to be used. Checkout the advanced example.
+
+### Fixed
+
+- Fixed a bug for custom_data, by adding a new variable named custom_data_path
+
 ## [5.1.1] - 2026-07-08
 
 ### Added

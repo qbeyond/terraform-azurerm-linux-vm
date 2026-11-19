@@ -5,6 +5,12 @@ All notable changes to this module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.2.1] - 2026-11-19
+
+### Fixed
+
+- Fixed a bug for deploying a disk without a zone. I have removed the validation, which is blocking this.
+
 ## [5.2.0] - 2026-07-15
 
 ### Added

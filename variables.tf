@@ -490,6 +490,7 @@ variable "name_overrides" {
     resource_group_name_nic       = optional(string)
     resource_group_name_data_disk = optional(string)
     resource_group_name_public_ip = optional(string)
+    disk_attachment_vm_id         = optional(string)
   })
   default     = {}
   nullable    = false

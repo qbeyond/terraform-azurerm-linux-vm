@@ -308,16 +308,6 @@ variable "data_disks" {
     error_message = "If enable on demand bursting, possible storage_account_type values are Premium_LRS, Premium_ZRS"
   }
   validation {
-    condition = alltrue([
-      for v in var.data_disks :
-      (
-        (v.storage_account_type != "PremiumV2_LRS") ||
-        (var.virtual_machine_config.zone != null)
-      )
-    ])
-    error_message = "PremiumV2_LRS storage_account_type requires zone to be set. Please set zone to 1, 2 or 3."
-  }
-  validation {
     condition = (
       length(distinct([
         for v in var.data_disks : var.virtual_machine_config.zone

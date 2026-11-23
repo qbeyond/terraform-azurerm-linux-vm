@@ -104,13 +104,19 @@ resource "azurerm_linux_virtual_machine" "this" {
     }
   }
 
-  additional_capabilities {
-    ultra_ssd_enabled   = var.virtual_machine_config.additional_capabilities.ultra_ssd_enabled
-    hibernation_enabled = var.virtual_machine_config.additional_capabilities.hibernation_enabled
+  dynamic "additional_capabilities" {
+    for_each = var.virtual_machine_config.additional_capabilities != null ? [var.virtual_machine_config.additional_capabilities] : []
+    content {
+      ultra_ssd_enabled   = additional_capabilities.value.ultra_ssd_enabled
+      hibernation_enabled = additional_capabilities.value.hibernation_enabled
+    }
   }
 
-  boot_diagnostics {
-    storage_account_uri = var.virtual_machine_config.boot_diagnostics.storage_account_uri
+  dynamic "boot_diagnostics" {
+    for_each = var.virtual_machine_config.boot_diagnostics != null ? [var.virtual_machine_config.boot_diagnostics] : []
+    content {
+      storage_account_uri = boot_diagnostics.value.storage_account_uri
+    }
   }
 
   os_disk {
@@ -191,13 +197,19 @@ resource "azurerm_linux_virtual_machine" "imported" {
     }
   }
 
-  additional_capabilities {
-    ultra_ssd_enabled   = var.virtual_machine_config.additional_capabilities.ultra_ssd_enabled
-    hibernation_enabled = var.virtual_machine_config.additional_capabilities.hibernation_enabled
+  dynamic "additional_capabilities" {
+    for_each = var.virtual_machine_config.additional_capabilities != null ? [var.virtual_machine_config.additional_capabilities] : []
+    content {
+      ultra_ssd_enabled   = additional_capabilities.value.ultra_ssd_enabled
+      hibernation_enabled = additional_capabilities.value.hibernation_enabled
+    }
   }
 
-  boot_diagnostics {
-    storage_account_uri = var.virtual_machine_config.boot_diagnostics.storage_account_uri
+  dynamic "boot_diagnostics" {
+    for_each = var.virtual_machine_config.boot_diagnostics != null ? [var.virtual_machine_config.boot_diagnostics] : []
+    content {
+      storage_account_uri = boot_diagnostics.value.storage_account_uri
+    }
   }
 
   os_disk {

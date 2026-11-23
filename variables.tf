@@ -176,16 +176,16 @@ variable "virtual_machine_config" {
     additional_capabilities = optional(object({
       ultra_ssd_enabled   = optional(bool, false)
       hibernation_enabled = optional(bool, false)
-    }), {})
+    }))
+
+    boot_diagnostics = optional(object({
+      storage_account_uri = optional(string)
+    }))
 
     identity = optional(object({
       identity_type = optional(string, null)
       identity_ids  = optional(list(string), null)
     }))
-
-    boot_diagnostics = optional(object({
-      storage_account_uri = optional(string, null)
-    }), {})
 
   })
   validation {
@@ -245,7 +245,7 @@ variable "virtual_machine_config" {
     custom_data_path: Optionally specify a custom data path of the script that should be run during the provisioning of the vm. This must be given, if custom_data is true.
     vtpm_enabled: Optionally enable vTPM for the VM. Defaults to true.
     secure_boot_enabled: Optionally enable secure boot for the VM. Defaults to true.
-    additional_capabilities: (Optional) Additional capabilities for the virtual machine.
+    additional_capabilities: (Optional) Additional capabilities for the virtual machine. Adding or changing these blocks on an EXISTING VM may trigger a stop/start of the VM (observed with azurerm 4.0.0). Plan during a maintenance window and review the plan carefully.
       ultra_ssd_enabled: (Optional) Enable UltraSSD_LRS for the virtual machine. Defaults to false.
       hibernation_enabled: (Optional) Enable hibernation for the virtual machine. Defaults to false.       
     identity: (Optional) Identity configuration for the virtual machine.
@@ -502,4 +502,9 @@ variable "tags" {
   default     = {}
   nullable    = false
   description = "A map of tags that will be set on every resource this module creates."
+}
+
+variable "acknowledge_vm_restart_risk" {
+  type    = bool
+  default = false
 }

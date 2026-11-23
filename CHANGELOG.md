@@ -5,6 +5,12 @@ All notable changes to this module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this module adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.3.1] - 2026-11-23
+
+### Fixed
+
+- Fixed additional_capabilities Block. Now the Block is default set to null. When updateing this block from null to false, the VM restarts, while applying. Now a warning was implemented to warn the user and also the documentation was edited to reflect this behavior.
+
 ## [5.3.0] - 2026-11-19
 
 ### Added
